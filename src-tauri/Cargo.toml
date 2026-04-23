@@ -1,0 +1,27 @@
+[package]
+name = "claudio-dj"
+version = "0.1.0"
+edition = "2021"
+description = "Claudio DJ - A Tauri-based DJ application"
+
+[lib]
+name = "claudio_dj_lib"
+crate-type = ["lib", "cdylib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+tauri-plugin-shell = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+log = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

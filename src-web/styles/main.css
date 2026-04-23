@@ -1,0 +1,29 @@
+:root {
+  /* Deep radio night colors */
+  --color-bg-primary: #08080C;
+  --color-bg-secondary: #121218;
+  --color-accent: #F59E0B;
+  --color-accent-dim: #B45309;
+  --color-text-primary: #F59E0B;
+  --color-text-secondary: #92400E;
+  --color-text-muted: #78350F;
+
+  /* Typography */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
