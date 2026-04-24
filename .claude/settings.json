@@ -41,7 +41,24 @@
       "Bash(convert -size 256x256 xc:'#F59E0B' 128x128@2x.png)",
       "Bash(magick -size 512x512 xc:'#F59E0B' icon.png)",
       "Bash(magick icon.png -colors 256 icon.ico)",
-      "Bash(magick icon.png -colors 256 icon.icns)"
+      "Bash(magick icon.png -colors 256 icon.icns)",
+      "Bash(magick -size 512x512 xc:'#0D0D12' icon_base.png)",
+      "Bash(magick icon_base.png -fill '#F59E0B' -draw \"circle 256,256 256,100\" icon_circle.png)",
+      "Bash(magick icon_circle.png -blur 0x30 icon_glow.png)",
+      "Bash(magick icon_base.png icon_glow.png -compose Screen -composite -fill '#F59E0B' -draw \"circle 256,256 256,120\" icon_cdj.png)",
+      "Bash(magick -size 512x512 'xc:#0D0D12' '\\(' +clone -fill '#F59E0B' -draw 'circle 256,256 256,90' '\\)' -compose DstOut -composite icon_outline.png)",
+      "Bash(magick icon_outline.png -fill '#F59E0B' -colorize 80 -fill '#0D0D12' -font Helvetica -pointsize 200 -gravity center -annotate +0+0 ♫ icon_with_text.png)",
+      "Bash(magick icon_with_text.png icon_outline.png -compose Over -composite icon_design.png)",
+      "Bash(rm -f icon_base.png icon_circle.png icon_glow.png icon_outline.png icon_with_text.png)",
+      "mcp__github__list_pull_requests",
+      "Bash(git tag *)",
+      "Bash(git push *)",
+      "mcp__github__list_releases",
+      "mcp__github__get_commit",
+      "mcp__github__get_file_contents",
+      "mcp__github__search_repositories",
+      "mcp__github__search_code",
+      "mcp__github__push_files"
     ],
     "additionalDirectories": [
       "/tmp"

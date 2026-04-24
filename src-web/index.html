@@ -1,845 +1,1045 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#F59E0B" />
-  <title>Claudio DJ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claudio</title>
   <style>
+    :root {
+      --bg: rgba(14, 14, 18, 0.88);
+      --surface: rgba(22, 22, 28, 0.92);
+      --card: rgba(28, 28, 36, 0.88);
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.25);
+      --text: #f0f0f2;
+      --text-muted: #7a7a7d;
+      --border: rgba(255, 255, 255, 0.07);
+      --radius: 18px;
+      --radius-sm: 10px;
+      --blur: blur(20px);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(180deg, #0D0D12 0%, #141418 100%);
-      color: #E5E5E5;
-      font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
+
+    html, body {
+      background: transparent;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      color: var(--text);
+      height: 100%;
+      overflow: hidden;
+      user-select: none;
     }
 
-    .container {
-      max-width: 420px;
-      margin: 0 auto;
-      padding: 1.5rem;
+    /* ========== WINDOW ========== */
+    .window {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,0.04) inset,
+        0 32px 80px rgba(0,0,0,0.7),
+        0 0 60px rgba(245,158,11,0.05);
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
-      min-height: 100vh;
+      overflow: hidden;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
     }
 
-    .header {
-      text-align: center;
-      padding: 1rem 0;
+    /* ========== COLLAPSED BAR ========== */
+    .bar {
+      display: none;
+      height: 48px;
+      padding: 0 14px;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
     }
-    .logo {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 0.15em;
-    }
+    .bar:hover { background: rgba(255,255,255,0.025); }
+    .bar.open { display: flex; }
 
-    .time-display {
-      text-align: center;
-      padding: 1rem 0;
-    }
-    .time {
-      font-size: 3.5rem;
-      font-weight: 200;
-      color: #fff;
-      font-variant-numeric: tabular-nums;
-    }
-    .date {
-      font-size: 0.875rem;
-      color: #666;
-    }
-
-    .player-card {
-      background: linear-gradient(145deg, #1e1e2e 0%, #141418 100%);
-      border-radius: 24px;
-      padding: 1.5rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
-
-    .album-section {
-      display: flex;
-      gap: 1.25rem;
-      margin-bottom: 1rem;
-    }
-    .album-art {
-      width: 100px;
-      height: 100px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+    .bar-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
-      overflow: hidden;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0a0a0f;
       flex-shrink: 0;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 12px rgba(245,158,11,0.35);
     }
-    .album-art img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .bar-avatar.breathing {
+      animation: breathe 3s ease-in-out infinite;
     }
-    .album-art.playing {
-      animation: glow 2s ease-in-out infinite;
-    }
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(245,158,11,0.2); }
-      50% { box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 40px rgba(245,158,11,0.4); }
+    @keyframes breathe {
+      0%,100% { box-shadow: 0 2px 12px rgba(245,158,11,0.35); }
+      50% { box-shadow: 0 2px 20px rgba(245,158,11,0.6); }
     }
 
-    .track-info {
-      flex: 1;
+    .bar-dots {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      overflow: hidden;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 14px;
+      margin: 0 2px;
     }
-    .track-name {
-      font-size: 1.125rem;
+    .bar-dot {
+      width: 2.5px;
+      border-radius: 2px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+    .bar.playing .bar-dot:nth-child(1) { height: 6px; animation: b1 0.8s ease-in-out infinite; }
+    .bar.playing .bar-dot:nth-child(2) { height: 10px; animation: b2 0.8s ease-in-out infinite 0.1s; }
+    .bar.playing .bar-dot:nth-child(3) { height: 14px; animation: b3 0.8s ease-in-out infinite 0.2s; }
+    .bar.playing .bar-dot:nth-child(4) { height: 10px; animation: b2 0.8s ease-in-out infinite 0.3s; }
+    .bar.playing .bar-dot:nth-child(5) { height: 6px; animation: b1 0.8s ease-in-out infinite 0.4s; }
+    @keyframes b1, b2, b3 {
+      0%,100% { transform: scaleY(0.4); opacity: 0.4; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .bar-info { flex: 1; min-width: 0; }
+    .bar-title {
+      font-size: 13px;
       font-weight: 600;
-      color: #fff;
+      line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .artist-name {
-      font-size: 0.875rem;
-      color: #888;
-      margin-top: 0.25rem;
-    }
-    .album-name {
-      font-size: 0.75rem;
-      color: #555;
-      margin-top: 0.25rem;
-    }
-
-    .progress-section {
-      margin: 1rem 0;
-    }
-    .progress-bar {
-      height: 4px;
-      background: #333;
-      border-radius: 2px;
+    .bar-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
       overflow: hidden;
-      cursor: pointer;
-    }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
-      width: 0%;
-    }
-    .time-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: #555;
+      text-overflow: ellipsis;
     }
 
-    .controls {
+    .bar-agent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .bar-agent-dot.idle { background: #4a4a4f; }
+    .bar-agent-dot.running { background: var(--accent); animation: pulse-dot 1.5s infinite; }
+    .bar-agent-dot.waiting { background: #ff9500; animation: pulse-dot 0.8s infinite; }
+    .bar-agent-dot.done { background: #34c759; }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ========== EXPANDED PANEL ========== */
+    .panel { display: none; flex-direction: column; height: 100%; }
+    .panel.open { display: flex; }
+
+    /* DRAG HANDLE */
+    .drag-zone {
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1.5rem;
-      margin: 1rem 0;
+      cursor: move;
+      flex-shrink: 0;
     }
-    .btn {
+    .drag-zone::before {
+      content: '';
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      padding: 0 14px 10px;
+      gap: 10px;
+    }
+    .topbar-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0a0a0f;
+      flex-shrink: 0;
+    }
+    .topbar-text { flex: 1; }
+    .topbar-title { font-size: 14px; font-weight: 700; }
+    .topbar-sub { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .topbar-actions { display: flex; gap: 6px; }
+    .topbar-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
       border: none;
-      background: none;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .topbar-btn:hover { background: rgba(255,255,255,0.09); color: var(--text); }
+    .topbar-btn.close:hover { background: rgba(255,60,60,0.25); color: #ff6b6b; }
+
+    /* AGENT CARD */
+    .agent-card {
+      margin: 0 14px 8px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
       cursor: pointer;
       transition: all 0.2s;
+    }
+    .agent-card:hover { background: rgba(255,255,255,0.04); }
+    .agent-card-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .agent-card-dot.idle { background: #4a4a4f; }
+    .agent-card-dot.running { background: var(--accent); animation: pulse-dot 1.5s infinite; }
+    .agent-card-dot.waiting { background: #ff9500; animation: pulse-dot 0.8s infinite; }
+    .agent-card-dot.done { background: #34c759; }
+    .agent-card-name { font-size: 12px; font-weight: 600; }
+    .agent-card-task { font-size: 11px; color: var(--text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .agent-card-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: rgba(255,149,0,0.15);
+      color: #ff9500;
+      font-weight: 600;
+      display: none;
+    }
+    .agent-card-badge.show { display: block; }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      padding: 0 14px;
+      gap: 3px;
+      margin-bottom: 8px;
+    }
+    .tab {
+      flex: 1;
+      height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+    .tab:hover:not(.active) { background: rgba(255,255,255,0.03); color: var(--text); }
+
+    /* CONTENT AREA */
+    .content { flex: 1; overflow: hidden; position: relative; }
+    .view { display: none; height: 100%; overflow-y: auto; padding: 0 14px 14px; flex-direction: column; }
+    .view.active { display: flex; }
+    .view::-webkit-scrollbar { width: 3px; }
+    .view::-webkit-scrollbar-track { background: transparent; }
+    .view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+    /* ========== NOW PLAYING ========== */
+    .now-playing {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px 16px 14px;
+      margin-bottom: 12px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .now-playing::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .now-playing-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.04);
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+    .now-playing-cover {
+      width: 72px;
+      height: 72px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #222230, #1a1a24);
+      margin: 0 auto 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #888;
+      font-size: 2rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
-    .btn:hover { color: #fff; transform: scale(1.1); }
-    .btn:active { transform: scale(0.95); }
-    .btn-sm { width: 44px; height: 44px; font-size: 1.25rem; }
-    .btn-lg {
-      width: 64px;
-      height: 64px;
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-      border-radius: 50%;
-      color: #08080C;
-      font-size: 1.5rem;
-      box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+    .now-playing-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
+    .now-playing-title {
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 3px;
+    }
+    .now-playing-artist { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
 
-    .dj-comment {
-      background: rgba(245,158,11,0.1);
-      border-left: 3px solid #F59E0B;
-      border-radius: 0 12px 12px 0;
-      padding: 1rem;
-      margin-top: 1rem;
-    }
-    .dj-label {
-      font-size: 0.7rem;
-      color: #F59E0B;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.5rem;
+    /* Mini waveform */
+    .mini-wave {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      gap: 2.5px;
+      height: 18px;
+      margin-bottom: 10px;
     }
-    .mute-btn {
-      background: none;
+    .mini-wave-bar {
+      width: 2.5px;
+      border-radius: 2px;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+    .mini-wave.playing .mini-wave-bar:nth-child(1) { height: 6px; animation: wb1 0.9s ease-in-out infinite; }
+    .mini-wave.playing .mini-wave-bar:nth-child(2) { height: 12px; animation: wb2 0.9s ease-in-out infinite 0.1s; }
+    .mini-wave.playing .mini-wave-bar:nth-child(3) { height: 18px; animation: wb3 0.9s ease-in-out infinite 0.2s; }
+    .mini-wave.playing .mini-wave-bar:nth-child(4) { height: 12px; animation: wb2 0.9s ease-in-out infinite 0.3s; }
+    .mini-wave.playing .mini-wave-bar:nth-child(5) { height: 6px; animation: wb1 0.9s ease-in-out infinite 0.4s; }
+    @keyframes wb1 { 0%,100%{transform:scaleY(0.35);opacity:0.4} 50%{transform:scaleY(1);opacity:1} }
+    @keyframes wb2 { 0%,100%{transform:scaleY(0.35);opacity:0.4} 50%{transform:scaleY(1);opacity:1} }
+    @keyframes wb3 { 0%,100%{transform:scaleY(0.35);opacity:0.4} 50%{transform:scaleY(1);opacity:1} }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .progress-row .time { font-size: 10px; color: var(--text-muted); min-width: 28px; }
+    .progress-row .time.right { text-align: right; }
+    .progress-track {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-track .fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s linear;
+    }
+
+    .np-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    .np-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       border: none;
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
       cursor: pointer;
-      font-size: 0.875rem;
-      padding: 0.25rem;
-      opacity: 0.7;
-    }
-    .mute-btn:hover { opacity: 1; }
-    .dj-text {
-      font-size: 0.875rem;
-      color: #ccc;
-      line-height: 1.6;
-    }
-
-    .lyrics-section {
-      margin-top: 1rem;
-      max-height: 100px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #333 transparent;
-    }
-    .lyrics-section::-webkit-scrollbar { width: 4px; }
-    .lyric-line {
-      font-size: 0.875rem;
-      color: #555;
-      padding: 0.25rem 0;
-      transition: color 0.3s;
-    }
-    .lyric-line.active {
-      color: #F59E0B;
-      font-weight: 500;
-    }
-
-    .chat-section {
-      flex: 1;
       display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      min-height: 150px;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s;
     }
-    .chat-header {
-      font-size: 0.75rem;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+    .np-btn:hover { background: rgba(255,255,255,0.12); }
+    .np-btn.main {
+      width: 42px;
+      height: 42px;
+      background: var(--accent);
+      color: #0a0a0f;
+      font-size: 17px;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.3);
     }
-    .chat-messages {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .message {
-      padding: 0.75rem 1rem;
-      border-radius: 16px;
-      font-size: 0.875rem;
+    .np-btn.main:hover { background: #fbbf24; transform: scale(1.05); }
+
+    /* AI SUGGESTION */
+    .ai-suggestion {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.15);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
       line-height: 1.5;
-      max-width: 85%;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .message.ai {
-      background: #1e1e2e;
-      color: #ccc;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
+    .ai-suggestion:hover { background: rgba(245,158,11,0.13); color: var(--text); }
+    .ai-suggestion::before { content: '🤖 '; }
+
+    /* ========== CHAT ========== */
+    .msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; min-height: 0; }
+    .msg {
+      max-width: 88%;
+      padding: 9px 13px;
+      border-radius: 15px;
+      font-size: 13px;
+      line-height: 1.5;
     }
-    .message.user {
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-      color: #08080C;
+    .msg.user {
       align-self: flex-end;
+      background: var(--accent);
+      color: #0a0a0f;
       border-bottom-right-radius: 4px;
     }
-    .message.song {
-      background: #22C55E;
-      color: #08080C;
+    .msg.ai {
       align-self: flex-start;
-      font-size: 0.8rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
     }
+    .msg.ai .msg-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+    .msg.system {
+      align-self: center;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      font-size: 11px;
+      border-radius: 99px;
+      padding: 5px 14px;
+    }
+    .msg.system.playing { color: var(--accent); }
 
-    .input-section {
+    .welcome-hint {
       display: flex;
-      gap: 0.75rem;
-      background: #141418;
-      border-radius: 24px;
-      padding: 0.5rem;
-      border: 1px solid #333;
-    }
-    .input-section:focus-within {
-      border-color: #F59E0B;
-    }
-    .input-section input {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px 16px;
       flex: 1;
-      background: none;
-      border: none;
-      padding: 0.75rem 1rem;
-      color: #fff;
-      font-size: 0.875rem;
     }
-    .input-section input:focus { outline: none; }
-    .input-section input::placeholder { color: #555; }
-    .send-btn {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-      border: none;
+    .welcome-hint .wh-icon { font-size: 2.2rem; margin-bottom: 8px; }
+    .welcome-hint .wh-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .welcome-hint .wh-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+    .chat-input-row {
+      display: flex;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .chat-input-row input {
+      flex: 1;
+      height: 38px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      padding: 0 15px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input-row input::placeholder { color: var(--text-muted); }
+    .chat-input-row input:focus { border-color: rgba(245,158,11,0.4); }
+    .chat-input-row button {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      color: #08080C;
+      border: none;
+      background: var(--accent);
+      color: #0a0a0f;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.125rem;
+      font-size: 15px;
+      flex-shrink: 0;
     }
 
-    .voice-btn {
-      width: 44px;
-      height: 44px;
-      background: #1e1e2e;
+    /* ========== SETTINGS ========== */
+    .settings-group { margin-bottom: 14px; }
+    .settings-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+    .settings-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 12px;
+      margin-bottom: 6px;
+    }
+    .settings-item-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .settings-item-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .settings-item select,
+    .settings-item input[type="text"],
+    .settings-item input[type="password"] {
+      width: 100%;
+      height: 32px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0 10px;
+      color: var(--text);
+      font-size: 12px;
+      margin-top: 7px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .settings-item select:focus,
+    .settings-item input:focus { border-color: rgba(245,158,11,0.4); }
+
+    .save-btn {
+      width: 100%;
+      height: 40px;
+      border-radius: 10px;
       border: none;
-      border-radius: 50%;
-      color: #888;
+      background: var(--accent);
+      color: #0a0a0f;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.125rem;
+      margin-top: 6px;
     }
-    .voice-btn.recording {
-      background: #ef4444;
-      color: #fff;
-      animation: pulse-record 1s infinite;
-    }
-    @keyframes pulse-record {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    .save-btn:hover { background: #fbbf24; }
+
+    .no-api-notice {
+      text-align: center;
+      padding: 16px;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.6;
+      background: rgba(245,158,11,0.05);
+      border: 1px solid rgba(245,158,11,0.1);
+      border-radius: var(--radius-sm);
+      margin-top: 8px;
     }
 
-    .status-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      color: #555;
-      padding-bottom: 1rem;
+    /* ========== STATUS TOAST ========== */
+    .status-toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: rgba(30,30,40,0.96);
+      border: 1px solid var(--border);
+      padding: 7px 16px;
+      border-radius: 99px;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
     }
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-    .status-dot.idle { background: #F59E0B; animation: pulse 2s infinite; }
-    .status-dot.speaking { background: #ef4444; animation: pulse 1s infinite; }
-    .status-dot.playing { background: #22C55E; }
-    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .status-toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="logo">CLAUDIO DJ</div>
+  <div class="window">
+
+    <!-- COLLAPSED BAR -->
+    <div class="bar" id="bar" onclick="expand()">
+      <div class="bar-avatar" id="barAvatar">C</div>
+      <div class="bar-dots" id="barDots">
+        <div class="bar-dot"></div>
+        <div class="bar-dot"></div>
+        <div class="bar-dot"></div>
+        <div class="bar-dot"></div>
+        <div class="bar-dot"></div>
+      </div>
+      <div class="bar-info">
+        <div class="bar-title" id="barTitle">Claudio</div>
+        <div class="bar-sub" id="barSub">点击展开</div>
+      </div>
+      <div class="bar-agent-dot idle" id="barAgentDot"></div>
     </div>
 
-    <div class="time-display">
-      <div class="time" id="time">--:--</div>
-      <div class="date" id="date">----/--/--</div>
-    </div>
+    <!-- EXPANDED PANEL -->
+    <div class="panel" id="panel">
+      <div class="drag-zone"></div>
 
-    <div class="player-card">
-      <div class="album-section">
-        <div class="album-art" id="albumArt">🎵</div>
-        <div class="track-info">
-          <div class="track-name" id="trackName">等待播放</div>
-          <div class="artist-name" id="artistName">---</div>
-          <div class="album-name" id="albumName">---</div>
+      <div class="topbar">
+        <div class="topbar-avatar">C</div>
+        <div class="topbar-text">
+          <div class="topbar-title">Claudio</div>
+          <div class="topbar-sub" id="topbarSub">VibeCoding 伴侣</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-btn" onclick="collapse()" title="收起">−</button>
+          <button class="topbar-btn close" onclick="closeWindow()" title="关闭">×</button>
         </div>
       </div>
 
-      <div class="progress-section">
-        <div class="progress-bar" id="progressBar">
-          <div class="progress-fill" id="progressFill"></div>
+      <!-- Agent Status Card -->
+      <div class="agent-card" id="agentCard">
+        <div class="agent-card-dot idle" id="agentDot"></div>
+        <div class="agent-card-name" id="agentName">无 Agent</div>
+        <div class="agent-card-task" id="agentTask">等待检测到工作 Agent...</div>
+        <div class="agent-card-badge" id="agentBadge">需确认</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="tabNow" onclick="switchTab('now')">🎵 音乐</button>
+        <button class="tab" id="tabChat" onclick="switchTab('chat')">💬 对话</button>
+        <button class="tab" id="tabSettings" onclick="switchTab('settings')">⚙ 设置</button>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content">
+
+        <!-- NOW PLAYING -->
+        <div class="view active" id="viewNow">
+          <div class="now-playing">
+            <div class="now-playing-source" id="npSource">
+              <span>🎵</span>
+              <span id="npSourceName">等待播放</span>
+            </div>
+            <div class="now-playing-cover" id="npCover">🎵</div>
+            <div class="now-playing-title" id="npTitle">未检测到播放中音乐</div>
+            <div class="now-playing-artist" id="npArtist">—</div>
+            <div class="mini-wave paused" id="miniWave">
+              <div class="mini-wave-bar"></div>
+              <div class="mini-wave-bar"></div>
+              <div class="mini-wave-bar"></div>
+              <div class="mini-wave-bar"></div>
+              <div class="mini-wave-bar"></div>
+            </div>
+            <div class="progress-row">
+              <span class="time" id="npCurrent">0:00</span>
+              <div class="progress-track"><div class="fill" id="npFill"></div></div>
+              <span class="time right" id="npTotal">0:00</span>
+            </div>
+            <div class="np-controls">
+              <button class="np-btn" onclick="prevTrack()">⏮</button>
+              <button class="np-btn main" id="npPlayBtn" onclick="togglePlayback()">▶</button>
+              <button class="np-btn" onclick="nextTrack()">⏭</button>
+            </div>
+          </div>
+          <div class="ai-suggestion" id="aiSuggestion" onclick="applySuggestion()">
+            点击这里，让 AI 聊聊这首歌
+          </div>
         </div>
-        <div class="time-row">
-          <span id="currentTime">0:00</span>
-          <span id="totalTime">0:00</span>
+
+        <!-- CHAT -->
+        <div class="view" id="viewChat">
+          <div class="msgs" id="msgs">
+            <div class="welcome-hint" id="welcomeHint">
+              <div class="wh-icon">🎧</div>
+              <div class="wh-title">嘿，来了～</div>
+              <div class="wh-desc">你的 Agent 正在工作。<br>可以在这里休息、听歌、聊聊音乐。</div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="和 Claudio 聊点什么..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button onclick="sendChat()">➤</button>
+          </div>
         </div>
-      </div>
 
-      <div class="controls">
-        <button class="btn btn-sm" id="prevBtn">⏮</button>
-        <button class="btn btn-lg" id="playBtn">▶</button>
-        <button class="btn btn-sm" id="nextBtn">⏭</button>
-      </div>
-
-      <div class="dj-comment" id="djComment">
-        <div class="dj-label">
-          🎙️ DJ 解说
-          <button class="mute-btn" id="muteBtn" style="display:none;">🔊</button>
+        <!-- SETTINGS -->
+        <div class="view" id="viewSettings">
+          <div class="settings-group">
+            <div class="settings-group-label">AI 配置</div>
+            <div class="settings-item">
+              <div class="settings-item-title">AI 模型</div>
+              <select id="sAiModel">
+                <option value="minimax">MiniMax</option>
+                <option value="claude">Claude</option>
+                <option value="qwen">通义千问</option>
+                <option value="zhipu">智谱</option>
+              </select>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-title">MiniMax API Key</div>
+              <div class="settings-item-desc">用于 AI 对话和语音合成</div>
+              <input type="password" id="sMinimaxKey" placeholder="eyJhbGci...">
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-title">Claude API Key</div>
+              <div class="settings-item-desc">如果使用 Claude 模型</div>
+              <input type="password" id="sClaudeKey" placeholder="sk-ant-...">
+            </div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-group-label">Agent 监听</div>
+            <div class="settings-item">
+              <div class="settings-item-title">日志目录</div>
+              <div class="settings-item-desc">Claudio 会轮询这些目录检测 Agent 状态</div>
+              <input type="text" id="sAgentPaths" placeholder="~/.claude/logs/, ~/.cursor/logs/">
+            </div>
+          </div>
+          <button class="save-btn" onclick="saveSettings()">保存设置</button>
+          <div class="no-api-notice" id="noApiNotice">
+            ⚠️ 请配置 API Key 后保存，Claudio 才能正常工作。
+          </div>
         </div>
-        <div class="dj-text" id="djText">点击播放后，我会为你解说音乐</div>
+
       </div>
-
-      <div class="lyrics-section" id="lyricsSection"></div>
-    </div>
-
-    <div class="chat-section">
-      <div class="chat-header">对话</div>
-      <div class="chat-messages" id="chatMessages">
-        <div class="message ai">👋 你好！我是 Claudio DJ，你的个人 AI 电台。告诉我你想听什么歌，或者聊聊音乐吧！</div>
-      </div>
-    </div>
-
-    <div class="input-section">
-      <button class="voice-btn" id="voiceBtn">🎤</button>
-      <input type="text" id="messageInput" placeholder="说点什么，或输入歌曲名..." />
-      <button class="send-btn" id="sendBtn">➤</button>
-    </div>
-
-    <div class="status-bar">
-      <div class="status-dot idle" id="statusDot"></div>
-      <span id="statusText">待机</span>
     </div>
   </div>
 
+  <!-- Status Toast -->
+  <div class="status-toast" id="statusToast">就绪</div>
+
   <script>
-    let audio = null;
+    // State
+    let isExpanded = false;
     let isPlaying = false;
-    let playlist = [];
-    let currentIndex = -1;
-    let lyricLines = [];
+    let currentTrack = null;
+    let aiSuggestion = '';
+    let lastSuggestion = '';
+    let trackProgress = 0;
+    let progressTimer = null;
     let synth = window.speechSynthesis;
-    let currentTrackData = null;
-    let isMuted = false;
 
-    // 尝试选择最好的中文语音
-    function selectBestChineseVoice() {
-      if (!synth) return null;
-      const voices = synth.getVoices();
-      // 优先选择中文语音
-      const chineseVoices = voices.filter(v => v.lang.includes('zh'));
-      // 尝试找腾讯/科大讯飞等质量较好的语音
-      const preferred = chineseVoices.find(v =>
-        v.name.includes('Ting') || v.name.includes('Yaoyao') ||
-        v.name.includes('Yunyang') || v.name.includes('Kangkang') ||
-        v.name.includes('Huihui') || v.name.includes('Google') ||
-        v.name.includes('Microsoft') || v.lang === 'zh-CN'
-      );
-      return preferred || chineseVoices[0] || voices[0] || null;
+    // DOM
+    const bar = document.getElementById('bar');
+    const panel = document.getElementById('panel');
+    const barTitle = document.getElementById('barTitle');
+    const barSub = document.getElementById('barSub');
+    const barDots = document.getElementById('barDots');
+    const barAvatar = document.getElementById('barAvatar');
+    const barAgentDot = document.getElementById('barAgentDot');
+    const topbarSub = document.getElementById('topbarSub');
+    const agentDot = document.getElementById('agentDot');
+    const agentName = document.getElementById('agentName');
+    const agentTask = document.getElementById('agentTask');
+    const agentBadge = document.getElementById('agentBadge');
+    const npSourceName = document.getElementById('npSourceName');
+    const npCover = document.getElementById('npCover');
+    const npTitle = document.getElementById('npTitle');
+    const npArtist = document.getElementById('npArtist');
+    const miniWave = document.getElementById('miniWave');
+    const npPlayBtn = document.getElementById('npPlayBtn');
+    const npFill = document.getElementById('npFill');
+    const npCurrent = document.getElementById('npCurrent');
+    const npTotal = document.getElementById('npTotal');
+    const aiSuggestionEl = document.getElementById('aiSuggestion');
+    const msgs = document.getElementById('msgs');
+    const welcomeHint = document.getElementById('welcomeHint');
+    const statusToast = document.getElementById('statusToast');
+    const noApiNotice = document.getElementById('noApiNotice');
+
+    // ========== WINDOW ==========
+    function collapse() {
+      isExpanded = false;
+      bar.classList.add('open');
+      panel.classList.remove('open');
+    }
+    function expand() {
+      isExpanded = true;
+      bar.classList.remove('open');
+      panel.classList.add('open');
+    }
+    function closeWindow() {
+      // Tauri close - would need invoke
+      collapse();
     }
 
-    // 等待语音列表加载
-    function waitForVoices() {
-      return new Promise(resolve => {
-        if (synth.onvoiceschanged !== undefined) {
-          synth.onvoiceschanged = () => resolve(selectBestChineseVoice());
-        }
-        const voice = selectBestChineseVoice();
-        if (voice) resolve(voice);
-        setTimeout(() => resolve(null), 1000);
-      });
+    // ========== TABS ==========
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('tab' + capitalize(tab)).classList.add('active');
+      document.getElementById('view' + capitalize(tab)).classList.add('active');
     }
-    const bestVoicePromise = waitForVoices();
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
-      document.getElementById('date').textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    // ========== NOW PLAYING ==========
+    function togglePlayback() {
+      // System-level playback control via backend
+      if (!currentTrack || !currentTrack.source) return;
+      const action = isPlaying ? 'pause' : 'play';
+      // TODO: invoke Tauri command to control playback
+      showToast(isPlaying ? '已暂停' : '正在播放');
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    function prevTrack() { showToast('上一首（需 Spotify 等支持）'); }
+    function nextTrack() { showToast('下一首（需 Spotify 等支持）'); }
 
-    const chatMessages = document.getElementById('chatMessages');
-    const messageInput = document.getElementById('messageInput');
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-    const trackName = document.getElementById('trackName');
-    const artistName = document.getElementById('artistName');
-    const albumName = document.getElementById('albumName');
-    const albumArt = document.getElementById('albumArt');
-    const progressFill = document.getElementById('progressFill');
-    const currentTimeEl = document.getElementById('currentTime');
-    const totalTimeEl = document.getElementById('totalTime');
-    const djComment = document.getElementById('djComment');
-    const djText = document.getElementById('djText');
-    const lyricsSection = document.getElementById('lyricsSection');
+    function updateNowPlaying(track) {
+      currentTrack = track;
+      npTitle.textContent = track.name || '未检测到播放中音乐';
+      npArtist.textContent = track.artist || '—';
+      npSourceName.textContent = track.source_app || '未知';
 
-    function addMessage(text, type) {
-      const msg = document.createElement('div');
-      msg.className = `message ${type}`;
-      msg.textContent = text;
-      chatMessages.appendChild(msg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function setStatus(text, state) {
-      statusText.textContent = text;
-      statusDot.className = `status-dot ${state}`;
-    }
-
-    function formatTime(s) {
-      if (!s) return '0:00';
-      return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
-    }
-
-    function parseLyrics(text) {
-      if (!text) return [];
-      return text.split('\n')
-        .filter(l => l.includes(']'))
-        .map(l => {
-          const match = l.match(/\[(\d{2}):(\d{2})\.\d{2}\](.*)/);
-          if (match) {
-            return { time: parseInt(match[1]) * 60 + parseInt(match[2]), text: match[3].trim() };
-          }
-          return null;
-        })
-        .filter(Boolean);
-    }
-
-    function highlightLyric(time) {
-      const lines = lyricsSection.querySelectorAll('.lyric-line');
-      let activeIdx = 0;
-      for (let i = 0; i < lyricLines.length; i++) {
-        if (lyricLines[i].time <= time) activeIdx = i;
+      if (track.playing) {
+        bar.classList.add('playing');
+        miniWave.classList.remove('paused');
+        npPlayBtn.textContent = '⏸';
+        isPlaying = true;
+      } else {
+        bar.classList.remove('playing');
+        miniWave.classList.add('paused');
+        npPlayBtn.textContent = '▶';
+        isPlaying = false;
       }
-      lines.forEach((l, i) => l.classList.toggle('active', i === activeIdx));
-      if (lines[activeIdx]) {
-        lines[activeIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      if (track.name && track.name !== '未知') {
+        barTitle.textContent = track.name;
+        barSub.textContent = track.artist || '';
+        barDots.style.display = track.playing ? 'flex' : 'none';
+      } else {
+        barTitle.textContent = 'Claudio';
+        barSub.textContent = '点击展开';
+        barDots.style.display = 'none';
+      }
+
+      // Update bar avatar breathing when music playing
+      if (track.playing) {
+        barAvatar.classList.add('breathing');
+      } else {
+        barAvatar.classList.remove('breathing');
       }
     }
 
-    function stopTTS() {
-      // 停止 MiniMax TTS
-      if (window.currentTTSAudio) {
-        window.currentTTSAudio.pause();
-        window.currentTTSAudio = null;
-      }
-      // 停止 Web Speech
-      if (synth) {
-        synth.cancel();
-      }
-      setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
-    }
-
-    function updateMuteButton() {
-      const muteBtn = document.getElementById('muteBtn');
-      muteBtn.textContent = isMuted ? '🔇' : '🔊';
-    }
-
-    async function speakText(text) {
-      if (!text) return;
-      if (isMuted) return;
-
-      // 首先尝试 MiniMax TTS
+    async function pollTrack() {
       try {
-        setStatus('DJ 播报中', 'speaking');
-        const res = await fetch('http://localhost:3001/api/tts', {
+        const res = await invoke('get_current_track');
+        if (res && res.name) {
+          updateNowPlaying(res);
+        } else {
+          updateNowPlaying({ name: '', artist: '', album: '', playing: false, source_app: '' });
+        }
+      } catch(e) {}
+    }
+
+    // ========== AGENT STATUS ==========
+    function updateAgentStatus(state, name, task) {
+      const dotClass = state === 'running' ? 'running'
+        : state === 'waiting' ? 'waiting'
+        : state === 'done' ? 'done' : 'idle';
+
+      agentDot.className = 'agent-card-dot ' + dotClass;
+      agentName.textContent = name || '无 Agent';
+      agentTask.textContent = task || '等待检测到工作 Agent...';
+      barAgentDot.className = 'bar-agent-dot ' + dotClass;
+      topbarSub.textContent = state === 'idle' ? 'VibeCoding 伴侣' : name + ' · ' + state;
+
+      if (state === 'waiting') {
+        agentBadge.classList.add('show');
+        if (!isExpanded) expand();
+      } else {
+        agentBadge.classList.remove('show');
+      }
+    }
+
+    async function pollAgent() {
+      try {
+        const res = await invoke('get_agent_status');
+        updateAgentStatus(res.state, res.name, res.task);
+      } catch(e) {
+        updateAgentStatus('idle', '无 Agent', '后端连接失败');
+      }
+    }
+
+    // ========== CHAT ==========
+    async function sendChat() {
+      const text = document.getElementById('chatInput').value.trim();
+      if (!text) return;
+      document.getElementById('chatInput').value = '';
+      if (welcomeHint) welcomeHint.style.display = 'none';
+      addMsg(text, 'user');
+
+      const model = document.getElementById('sAiModel')?.value || 'minimax';
+      showToast('Claudio 思考中...');
+
+      try {
+        const res = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, speed: 1.0, emotion: 'calm' })
+          body: JSON.stringify({ model, message: text })
         });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.audio) {
-            // 停止之前的语音
-            if (window.currentTTSAudio) {
-              window.currentTTSAudio.pause();
+        const data = await res.json();
+        if (data.say) {
+          addMsg(data.say, 'ai');
+          // Speak it
+          try {
+            const ttsRes = await fetch('http://localhost:3001/api/tts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: data.say, speed: 1.0, emotion: 'calm' })
+            });
+            const ttsData = await ttsRes.json();
+            if (ttsData.audio) {
+              const a = new Audio('data:audio/mp3;base64,' + ttsData.audio);
+              a.play();
             }
-            const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
-            window.currentTTSAudio = audio;
-            audio.onended = () => {
-              if (isPlaying) setStatus('播放中', 'playing');
-              else setStatus('待机', 'idle');
-            };
-            audio.onerror = () => {
-              console.warn('[TTS] MiniMax playback failed, falling back to Web Speech');
-              if (!isMuted) fallbackToWebSpeech(text);
-            };
-            audio.play();
-            return; // 成功播放，退出
-          }
+          } catch(e) {}
+          showToast('就绪');
         }
-      } catch (err) {
-        console.warn('[TTS] MiniMax TTS failed:', err);
+      } catch(e) {
+        addMsg('连接后端失败，请确保服务运行中', 'ai');
+        showToast('连接失败');
       }
-
-      // 降级到 Web Speech Synthesis
-      fallbackToWebSpeech(text);
     }
 
-    function fallbackToWebSpeech(text) {
-      if (!synth) {
-        console.warn('[TTS] Web Speech Synthesis not available');
-        setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
+    function addMsg(text, type) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + type;
+      if (type === 'ai') div.innerHTML = '<div class="msg-label">CLAUDIO</div>' + escHtml(text);
+      else div.textContent = text;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function escHtml(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    // ========== SETTINGS ==========
+    function saveSettings() {
+      const s = {
+        aiModel: document.getElementById('sAiModel').value,
+        minimaxKey: document.getElementById('sMinimaxKey').value,
+        claudeKey: document.getElementById('sClaudeKey').value,
+        agentPaths: document.getElementById('sAgentPaths').value
+      };
+      localStorage.setItem('claudio_settings', JSON.stringify(s));
+
+      // Update agent paths in backend
+      const paths = s.agentPaths.split(',').map(p => p.trim()).filter(Boolean);
+      invoke('set_agent_paths', { paths }).catch(() => {});
+
+      showToast('设置已保存');
+    }
+
+    function loadSettings() {
+      const saved = localStorage.getItem('claudio_settings');
+      if (saved) {
+        const s = JSON.parse(saved);
+        if (document.getElementById('sAiModel')) document.getElementById('sAiModel').value = s.aiModel || 'minimax';
+        if (document.getElementById('sMinimaxKey')) document.getElementById('sMinimaxKey').value = s.minimaxKey || '';
+        if (document.getElementById('sClaudeKey')) document.getElementById('sClaudeKey').value = s.claudeKey || '';
+        if (document.getElementById('sAgentPaths')) document.getElementById('sAgentPaths').value = s.agentPaths || '~/.claude/logs/, ~/.cursor/logs/';
+      } else {
+        if (document.getElementById('sAgentPaths')) document.getElementById('sAgentPaths').value = '~/.claude/logs/, ~/.cursor/logs/';
+      }
+    }
+
+    // ========== TOAST ==========
+    let toastTimer = null;
+    function showToast(msg) {
+      statusToast.textContent = msg;
+      statusToast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => statusToast.classList.remove('show'), 2500);
+    }
+
+    // ========== Tauri invoke ==========
+    async function invoke(cmd, args = {}) {
+      return new Promise((resolve, reject) => {
+        if (window.__TAURI__) {
+          window.__TAURI__.core.invoke(cmd, args).then(resolve).catch(reject);
+        } else {
+          reject(new Error('Not in Tauri'));
+        }
+      });
+    }
+
+    // ========== AI SUGGESTION ==========
+    function applySuggestion() {
+      if (!aiSuggestion) return;
+      if (welcomeHint) welcomeHint.style.display = 'none';
+      switchTab('chat');
+      document.getElementById('chatInput').value = aiSuggestion;
+      sendChat();
+      aiSuggestion = '';
+      aiSuggestionEl.style.display = 'none';
+    }
+
+    async function generateSuggestion() {
+      if (!currentTrack || !currentTrack.name || currentTrack.name === '未知') {
+        aiSuggestionEl.style.display = 'none';
         return;
       }
-      if (isMuted) return;
-
-      synth.cancel();
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = 'zh-CN';
-      utt.rate = 1.0;
-      utt.pitch = 1.0;
-
-      utt.onstart = () => setStatus('DJ 播报中', 'speaking');
-      utt.onend = () => {
-        if (isPlaying) setStatus('播放中', 'playing');
-        else setStatus('待机', 'idle');
-      };
-      utt.onerror = () => {
-        if (isPlaying) setStatus('播放中', 'playing');
-        else setStatus('待机', 'idle');
-      };
-
-      synth.speak(utt);
-    }
-
-    // 播放时请求 AI 生成 DJ 解说
-    async function requestDJCommentary(track) {
       try {
-        setStatus('DJ 思考中...', 'speaking');
+        const model = document.getElementById('sAiModel')?.value || 'minimax';
         const res = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'minimax',
-            message: `请为这首歌曲生成一段 DJ 解说。我需要你简洁地介绍这首歌的音乐风格、演唱者背景或者听感体验，用于在电台节目中播放。格式要求：直接返回 JSON，格式：{"say":"解说内容"}。歌曲信息：${track.name} - ${track.artist}，专辑：${track.album}`
+            model,
+            message: `用户正在听《${currentTrack.name}》by ${currentTrack.artist}。请用一句话评价这首歌，或者问用户一个问题引导聊这首歌。只需要回复一句话，不需要其他内容。`
           })
         });
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
         const data = await res.json();
-
-        // 确保 say 有有效内容
-        if (data.say && typeof data.say === 'string' && data.say.trim()) {
-          djText.textContent = data.say;
-          // 延迟一点再播报，让用户先看到文字
-          setTimeout(() => speakText(data.say), 500);
-        } else {
-          djText.textContent = `正在播放：${track.name} - ${track.artist}`;
+        if (data.say && data.say !== lastSuggestion) {
+          aiSuggestion = data.say;
+          lastSuggestion = data.say;
+          aiSuggestionEl.textContent = '🤖 ' + data.say;
+          aiSuggestionEl.style.display = 'block';
         }
-      } catch (err) {
-        console.error('[DJ] Commentary error:', err);
-        djText.textContent = `正在播放：${track.name} - ${track.artist}`;
-      }
+      } catch(e) {}
     }
 
-    function playTrack(data) {
-      if (audio) { audio.pause(); audio = null; }
-      currentTrackData = data;
-      trackName.textContent = data.name || '未知';
-      artistName.textContent = data.artist || '未知';
-      albumName.textContent = data.album || '未知';
+    // ========== INIT ==========
+    loadSettings();
+    collapse();
 
-      if (data.albumPic) {
-        albumArt.innerHTML = `<img src="${data.albumPic}" alt="album">`;
-      } else {
-        albumArt.innerHTML = '🎵';
+    // Poll every 3 seconds
+    pollTrack();
+    pollAgent();
+    setInterval(pollTrack, 3000);
+    setInterval(pollAgent, 5000);
+    setInterval(generateSuggestion, 15000);
+
+    // Click outside to collapse
+    document.addEventListener('click', e => {
+      if (isExpanded && !document.querySelector('.window').contains(e.target)) {
+        collapse();
       }
-
-      if (data.url) {
-        audio = new Audio(data.url);
-        audio.play();
-        isPlaying = true;
-        document.getElementById('playBtn').textContent = '⏸';
-        albumArt.classList.add('playing');
-        setStatus('播放中', 'playing');
-
-        // 解析歌词
-        lyricLines = parseLyrics(data.lyric);
-        lyricsSection.innerHTML = lyricLines.length > 0
-          ? lyricLines.map((l, i) => `<div class="lyric-line ${i === 0 ? 'active' : ''}">${l.text || '♪'}</div>`).join('')
-          : '<div class="lyric-line">暂无歌词</div>';
-
-        audio.addEventListener('loadedmetadata', () => {
-          totalTimeEl.textContent = formatTime(audio.duration);
-        });
-
-        audio.addEventListener('timeupdate', () => {
-          if (audio.duration) {
-            progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-            currentTimeEl.textContent = formatTime(audio.currentTime);
-            highlightLyric(audio.currentTime);
-          }
-        });
-
-        audio.addEventListener('ended', () => {
-          isPlaying = false;
-          document.getElementById('playBtn').textContent = '▶';
-          albumArt.classList.remove('playing');
-          setStatus('播放结束', 'idle');
-          playNext();
-        });
-
-        // 播放时请求 DJ 解说
-        requestDJCommentary(data);
-      }
-    }
-
-    function togglePlay() {
-      if (!audio) return;
-      if (isPlaying) {
-        audio.pause();
-        isPlaying = false;
-        document.getElementById('playBtn').textContent = '▶';
-        setStatus('已暂停', 'idle');
-      } else {
-        audio.play();
-        isPlaying = true;
-        document.getElementById('playBtn').textContent = '⏸';
-        setStatus('播放中', 'playing');
-      }
-    }
-
-    function playNext() {
-      console.log(`[Playlist] playNext: length=${playlist.length}, currentIndex=${currentIndex}`);
-      if (playlist.length === 0) {
-        console.warn('[Playlist] Playlist is empty!');
-        return;
-      }
-      if (currentIndex < 0) currentIndex = 0;
-      currentIndex = (currentIndex + 1) % playlist.length;
-      console.log(`[Playlist] Playing index ${currentIndex}:`, playlist[currentIndex]?.name);
-      playTrack(playlist[currentIndex]);
-    }
-
-    function playPrev() {
-      console.log(`[Playlist] playPrev: length=${playlist.length}, currentIndex=${currentIndex}`);
-      if (playlist.length === 0) {
-        console.warn('[Playlist] Playlist is empty!');
-        return;
-      }
-      if (currentIndex < 0) currentIndex = 0;
-      currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-      console.log(`[Playlist] Playing index ${currentIndex}:`, playlist[currentIndex]?.name);
-      playTrack(playlist[currentIndex]);
-    }
-
-    // 语音识别
-    let recognition = null;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'zh-CN';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        messageInput.value = text;
-        sendMessage();
-      };
-
-      recognition.onerror = () => {
-        voiceBtn.classList.remove('recording');
-        addMessage('语音识别出错', 'ai');
-      };
-
-      recognition.onend = () => {
-        voiceBtn.classList.remove('recording');
-      };
-    }
-
-    async function sendMessage() {
-      const text = messageInput.value.trim();
-      if (!text) return;
-      messageInput.value = '';
-      addMessage(text, 'user');
-      setStatus('思考中...', 'speaking');
-
-      try {
-        const res = await fetch('http://localhost:3001/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'minimax', message: text })
-        });
-        const data = await res.json();
-
-        if (data.say && typeof data.say === 'string' && data.say.trim()) {
-          addMessage(data.say, 'ai');
-          speakText(data.say);
-        } else if (data.reason) {
-          // 有 reason 但没有 say，显示提示
-          addMessage('[DJ 思考中...]', 'ai');
-        }
-
-        if (data.segue) {
-          djText.textContent = data.segue;
-        }
-
-        if (data.play && data.play.length > 0) {
-          // 批量获取所有歌曲的播放数据
-          const batchRes = await fetch('http://localhost:3001/api/music/batch', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ songs: data.play })
-          });
-          const batchData = await batchRes.json();
-
-          if (batchData.songs && batchData.songs.length > 0) {
-            playlist = batchData.songs;
-            currentIndex = 0;
-            addMessage(`🎵 播放列表: ${data.play.join(', ')}`, 'song');
-            playTrack(playlist[currentIndex]);
-          } else {
-            addMessage('无法播放这些歌曲', 'ai');
-          }
-        }
-      } catch (err) {
-        addMessage('出错: ' + err.message, 'ai');
-      }
-      setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
-    }
-
-    document.getElementById('sendBtn').addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
-    document.getElementById('playBtn').addEventListener('click', togglePlay);
-    document.getElementById('nextBtn').addEventListener('click', () => { addMessage('下一首', 'user'); playNext(); });
-    document.getElementById('prevBtn').addEventListener('click', () => { addMessage('上一首', 'user'); playPrev(); });
-
-    document.getElementById('progressBar').addEventListener('click', e => {
-      if (!audio || !audio.duration) return;
-      const rect = e.target.getBoundingClientRect();
-      audio.currentTime = (e.clientX - rect.left) / rect.width * audio.duration;
-    });
-
-    const voiceBtn = document.getElementById('voiceBtn');
-    if (recognition) {
-      voiceBtn.addEventListener('click', () => {
-        if (voiceBtn.classList.contains('recording')) {
-          recognition.stop();
-          return;
-        }
-        voiceBtn.classList.add('recording');
-        recognition.start();
-      });
-    } else {
-      voiceBtn.title = '浏览器不支持语音识别';
-    }
-
-    // 静音按钮
-    const muteBtn = document.getElementById('muteBtn');
-    muteBtn.style.display = 'block';
-    muteBtn.addEventListener('click', () => {
-      isMuted = !isMuted;
-      if (isMuted) {
-        stopTTS();
-      }
-      updateMuteButton();
     });
   </script>
 </body>
