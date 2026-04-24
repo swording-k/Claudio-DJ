@@ -4,7 +4,40 @@
       "mcp__MiniMax__understand_image",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/)",
       "Read(//Users/baojian/**)",
-      "Bash(sqlite3 ~/.claude/state.db \".tables\")"
+      "Bash(sqlite3 ~/.claude/state.db \".tables\")",
+      "Bash(curl -s \"https://api.github.com/repos/nooblong/NeteaseCloudMusicApiBackup/contents\")",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s \"http://localhost:3001/api/music/search?q=test\")",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"你好，你是Claudio DJ，一个个人AI电台。请用JSON格式回复，包含say字段说一句话。\"}')",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"你好，请用JSON格式回复，包含say字段说一句话。\"}')",
+      "Bash(curl -s -X POST https://api.minimax.chat/v1/text/chatcompletion_v2 -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -d '{\"model\": \"abab5.5s-chat\", \"tokens_to_generate\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST https://api.minimax.chat/v1/text/chatcompletion_v2 -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -d '{\"model\": \"MiniMax-Text-01\", \"tokens_to_generate\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST https://api.minimax.chat/v1/text/chatcompletion_v2 -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -d '{\"model\": \"abab6-chat\", \"tokens_to_generate\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST https://api.minimax.chat/v1/text/chatcompletion_v2 -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -d '{\"model\": \"abab5.5-chat\", \"tokens_to_generate\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST https://api.minimaxi.com/v1/text/chatcompletion_v2 -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -d '{\"model\": \"abab5.5-chat\", \"tokens_to_generate\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"你好，请用JSON格式回复，包含say字段说一句话介绍自己是Claudio DJ个人AI电台。\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"你好\"}')",
+      "Bash(curl -s -X POST https://api.minimaxi.com/anthropic/v1/messages -H 'Content-Type: application/json' -H 'x-api-key: sk-cp-fj-x5ZkJzQKllQms6vaOpHDcWN4doqYT3_hCVkciarb32QXTd9FL_5Iz_Wj1oIwxK_FOvXmqOma3bSjwQcpfSLFPCcsE2Wv0A17Ay5vEdeRmwZdhC9tvsvU' -H 'anthropic-version: 2023-06-01' -d '{\"model\": \"MiniMax-M2.7\", \"max_tokens\": 100, \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}]}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"现在是早上7点，用户喜欢华语流行音乐，请生成一段早间播报内容并推荐一首歌曲，用JSON格式回复。\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/chat -H 'Content-Type: application/json' -d '{\"model\": \"minimax\", \"message\": \"早上好，请用JSON格式回复，包含say和play字段。\"}')",
+      "Bash(curl -s \"http://localhost:3001/api/music/play?q=周杰伦\")",
+      "Bash(curl -s \"http://localhost:3001/api/music/play?q=稻香\")",
+      "Bash(curl -v \"http://localhost:3001/api/music/play?q=test\")",
+      "Bash(curl -s \"http://localhost:3000/cloudsearch?keywords=稻香\")",
+      "Bash(curl -v \"http://localhost:3000/\")",
+      "Bash(curl -v \"http://localhost:3000/cloudsearch?keywords=test\")",
+      "Read(//tmp/**)",
+      "Bash(pkill -f \"tsx.*src-server\")",
+      "Bash(npm run *)",
+      "Bash(pkill -f \"node.*3001\")",
+      "WebSearch",
+      "WebFetch(domain:www.minimaxi.com)",
+      "WebFetch(domain:platform.minimaxi.com)",
+      "mcp__github__get_me"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   }
 }

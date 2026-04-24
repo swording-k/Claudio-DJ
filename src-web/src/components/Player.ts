@@ -1,7 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
 
-@customElement('player-component')
 export class PlayerComponent extends LitElement {
   static styles = css`
     :host {
@@ -10,13 +8,11 @@ export class PlayerComponent extends LitElement {
       background: #121218;
       border-radius: 12px;
     }
-
     .player-container {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
-
     .visualizer {
       display: flex;
       align-items: flex-end;
@@ -25,37 +21,31 @@ export class PlayerComponent extends LitElement {
       height: 60px;
       padding: 0.5rem;
     }
-
     .bar {
       width: 8px;
       background: linear-gradient(to top, #F59E0B, #FBBF24);
       border-radius: 2px;
       transition: height 0.1s ease;
     }
-
     .song-info {
       text-align: center;
     }
-
     .song-name {
       font-size: 1.25rem;
       font-weight: 600;
       color: #E5E5E5;
       margin-bottom: 0.25rem;
     }
-
     .artist {
       font-size: 0.875rem;
       color: #92400E;
     }
-
     .progress-bar {
       height: 4px;
       background: #1a1a2e;
       border-radius: 2px;
       overflow: hidden;
     }
-
     .progress-fill {
       height: 100%;
       background: linear-gradient(to right, #F59E0B, #FBBF24);
@@ -64,13 +54,19 @@ export class PlayerComponent extends LitElement {
     }
   `;
 
-  @property({ type: Boolean }) isPlaying = false;
-  @property({ type: String }) songName = '';
-  @property({ type: String }) artist = '';
-  @property({ type: Number }) progress = 0;
+  isPlaying = false;
+  songName = '';
+  artist = '';
+  progress = 0;
 
-  @state() private bars: number[] = Array(20).fill(0);
+  static properties = {
+    isPlaying: { type: Boolean },
+    songName: { type: String },
+    artist: { type: String },
+    progress: { type: Number },
+  };
 
+  private bars: number[] = Array(20).fill(0);
   private animationFrame: number | null = null;
 
   connectedCallback() {
@@ -101,9 +97,7 @@ export class PlayerComponent extends LitElement {
     return html`
       <div class="player-container">
         <div class="visualizer">
-          ${this.bars.map((height, i) => html`
-            <div class="bar" style="height: ${height}%"></div>
-          `)}
+          ${this.bars.map((height) => html`<div class="bar" style="height: ${height}%"></div>`)}
         </div>
         <div class="song-info">
           <div class="song-name">${this.songName || 'No Track'}</div>
@@ -116,3 +110,5 @@ export class PlayerComponent extends LitElement {
     `;
   }
 }
+
+customElements.define('player-component', PlayerComponent);

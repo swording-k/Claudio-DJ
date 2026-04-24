@@ -3,14 +3,15 @@ const NCM_API = 'http://localhost:3000';
 export interface NeteaseSong {
   id: number;
   name: string;
-  artists: { name: string }[];
-  album: { name: string };
+  ar: { name: string }[];
+  al: { name: string; picUrl: string };
 }
 
 export interface PlayableSong {
   name: string;
   artist: string;
   album: string;
+  albumPic: string;
   url: string;
   lyric?: string;
 }
@@ -46,9 +47,17 @@ export async function searchSong(keyword: string): Promise<NeteaseSong[]> {
 }
 
 export async function getSongUrl(songId: number): Promise<string | null> {
-  const url = `${NCM_API}/song/url/v1?id=${songId}&level=standard`;
-  const data = await fetchJson<SongUrlResponse>(url);
-  return data?.data?.[0]?.url ?? null;
+  const levels = ['exhigh', 'higher', 'standard'];
+  for (const level of levels) {
+    const url = `${NCM_API}/song/url/v1?id=${songId}&level=${level}`;
+    const data = await fetchJson<SongUrlResponse>(url);
+    if (data?.data?.[0]?.url) {
+      console.log(`[Music] Song ${songId}: level=${level} success`);
+      return data.data[0].url;
+    }
+  }
+  console.log(`[Music] Song ${songId}: no playable URL found`);
+  return null;
 }
 
 export async function getLyric(songId: number): Promise<string | null> {
@@ -61,19 +70,22 @@ export async function findPlayableSong(keyword: string): Promise<PlayableSong | 
   const songs = await searchSong(keyword);
   if (songs.length === 0) return null;
 
-  const song = songs[0];
-  const [url, lyric] = await Promise.all([
-    getSongUrl(song.id),
-    getLyric(song.id),
-  ]);
+  // Try multiple songs until we find one with a playable URL
+  for (const song of songs) {
+    const url = await getSongUrl(song.id);
+    if (!url) continue;
 
-  if (!url) return null;
+    const lyric = await getLyric(song.id);
 
-  return {
-    name: song.name,
-    artist: song.artists.map((a) => a.name).join(', '),
-    album: song.album.name,
-    url,
-    lyric: lyric ?? undefined,
-  };
+    return {
+      name: song.name,
+      artist: song.ar.map((a) => a.name).join(', '),
+      album: song.al.name,
+      albumPic: song.al.picUrl || '',
+      url,
+      lyric: lyric ?? undefined,
+    };
+  }
+
+  return null;
 }

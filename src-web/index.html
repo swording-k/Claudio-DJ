@@ -1,14 +1,846 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#F59E0B" />
-    <title>Claudio DJ</title>
-    <link rel="manifest" href="/manifest.json" />
-  </head>
-  <body>
-    <app-root></app-root>
-    <script type="module" src="./src/main.ts"></script>
-  </body>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F59E0B" />
+  <title>Claudio DJ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, #0D0D12 0%, #141418 100%);
+      color: #E5E5E5;
+      font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.15em;
+    }
+
+    .time-display {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .time {
+      font-size: 3.5rem;
+      font-weight: 200;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+    .date {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .player-card {
+      background: linear-gradient(145deg, #1e1e2e 0%, #141418 100%);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .album-section {
+      display: flex;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .album-art {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .album-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .album-art.playing {
+      animation: glow 2s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(245,158,11,0.2); }
+      50% { box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 40px rgba(245,158,11,0.4); }
+    }
+
+    .track-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .track-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .artist-name {
+      font-size: 0.875rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+    .album-name {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
+
+    .progress-section {
+      margin: 1rem 0;
+    }
+    .progress-bar {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
+      width: 0%;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: #555;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1rem 0;
+    }
+    .btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+    }
+    .btn:hover { color: #fff; transform: scale(1.1); }
+    .btn:active { transform: scale(0.95); }
+    .btn-sm { width: 44px; height: 44px; font-size: 1.25rem; }
+    .btn-lg {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      border-radius: 50%;
+      color: #08080C;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+    }
+
+    .dj-comment {
+      background: rgba(245,158,11,0.1);
+      border-left: 3px solid #F59E0B;
+      border-radius: 0 12px 12px 0;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .dj-label {
+      font-size: 0.7rem;
+      color: #F59E0B;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mute-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      padding: 0.25rem;
+      opacity: 0.7;
+    }
+    .mute-btn:hover { opacity: 1; }
+    .dj-text {
+      font-size: 0.875rem;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .lyrics-section {
+      margin-top: 1rem;
+      max-height: 100px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #333 transparent;
+    }
+    .lyrics-section::-webkit-scrollbar { width: 4px; }
+    .lyric-line {
+      font-size: 0.875rem;
+      color: #555;
+      padding: 0.25rem 0;
+      transition: color 0.3s;
+    }
+    .lyric-line.active {
+      color: #F59E0B;
+      font-weight: 500;
+    }
+
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 150px;
+    }
+    .chat-header {
+      font-size: 0.75rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .chat-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .message {
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      max-width: 85%;
+    }
+    .message.ai {
+      background: #1e1e2e;
+      color: #ccc;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .message.user {
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      color: #08080C;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message.song {
+      background: #22C55E;
+      color: #08080C;
+      align-self: flex-start;
+      font-size: 0.8rem;
+    }
+
+    .input-section {
+      display: flex;
+      gap: 0.75rem;
+      background: #141418;
+      border-radius: 24px;
+      padding: 0.5rem;
+      border: 1px solid #333;
+    }
+    .input-section:focus-within {
+      border-color: #F59E0B;
+    }
+    .input-section input {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-size: 0.875rem;
+    }
+    .input-section input:focus { outline: none; }
+    .input-section input::placeholder { color: #555; }
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      border: none;
+      border-radius: 50%;
+      color: #08080C;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+    }
+
+    .voice-btn {
+      width: 44px;
+      height: 44px;
+      background: #1e1e2e;
+      border: none;
+      border-radius: 50%;
+      color: #888;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+    }
+    .voice-btn.recording {
+      background: #ef4444;
+      color: #fff;
+      animation: pulse-record 1s infinite;
+    }
+    @keyframes pulse-record {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: #555;
+      padding-bottom: 1rem;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .status-dot.idle { background: #F59E0B; animation: pulse 2s infinite; }
+    .status-dot.speaking { background: #ef4444; animation: pulse 1s infinite; }
+    .status-dot.playing { background: #22C55E; }
+    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">CLAUDIO DJ</div>
+    </div>
+
+    <div class="time-display">
+      <div class="time" id="time">--:--</div>
+      <div class="date" id="date">----/--/--</div>
+    </div>
+
+    <div class="player-card">
+      <div class="album-section">
+        <div class="album-art" id="albumArt">🎵</div>
+        <div class="track-info">
+          <div class="track-name" id="trackName">等待播放</div>
+          <div class="artist-name" id="artistName">---</div>
+          <div class="album-name" id="albumName">---</div>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="time-row">
+          <span id="currentTime">0:00</span>
+          <span id="totalTime">0:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-sm" id="prevBtn">⏮</button>
+        <button class="btn btn-lg" id="playBtn">▶</button>
+        <button class="btn btn-sm" id="nextBtn">⏭</button>
+      </div>
+
+      <div class="dj-comment" id="djComment">
+        <div class="dj-label">
+          🎙️ DJ 解说
+          <button class="mute-btn" id="muteBtn" style="display:none;">🔊</button>
+        </div>
+        <div class="dj-text" id="djText">点击播放后，我会为你解说音乐</div>
+      </div>
+
+      <div class="lyrics-section" id="lyricsSection"></div>
+    </div>
+
+    <div class="chat-section">
+      <div class="chat-header">对话</div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message ai">👋 你好！我是 Claudio DJ，你的个人 AI 电台。告诉我你想听什么歌，或者聊聊音乐吧！</div>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <button class="voice-btn" id="voiceBtn">🎤</button>
+      <input type="text" id="messageInput" placeholder="说点什么，或输入歌曲名..." />
+      <button class="send-btn" id="sendBtn">➤</button>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot idle" id="statusDot"></div>
+      <span id="statusText">待机</span>
+    </div>
+  </div>
+
+  <script>
+    let audio = null;
+    let isPlaying = false;
+    let playlist = [];
+    let currentIndex = -1;
+    let lyricLines = [];
+    let synth = window.speechSynthesis;
+    let currentTrackData = null;
+    let isMuted = false;
+
+    // 尝试选择最好的中文语音
+    function selectBestChineseVoice() {
+      if (!synth) return null;
+      const voices = synth.getVoices();
+      // 优先选择中文语音
+      const chineseVoices = voices.filter(v => v.lang.includes('zh'));
+      // 尝试找腾讯/科大讯飞等质量较好的语音
+      const preferred = chineseVoices.find(v =>
+        v.name.includes('Ting') || v.name.includes('Yaoyao') ||
+        v.name.includes('Yunyang') || v.name.includes('Kangkang') ||
+        v.name.includes('Huihui') || v.name.includes('Google') ||
+        v.name.includes('Microsoft') || v.lang === 'zh-CN'
+      );
+      return preferred || chineseVoices[0] || voices[0] || null;
+    }
+
+    // 等待语音列表加载
+    function waitForVoices() {
+      return new Promise(resolve => {
+        if (synth.onvoiceschanged !== undefined) {
+          synth.onvoiceschanged = () => resolve(selectBestChineseVoice());
+        }
+        const voice = selectBestChineseVoice();
+        if (voice) resolve(voice);
+        setTimeout(() => resolve(null), 1000);
+      });
+    }
+    const bestVoicePromise = waitForVoices();
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+      document.getElementById('date').textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const trackName = document.getElementById('trackName');
+    const artistName = document.getElementById('artistName');
+    const albumName = document.getElementById('albumName');
+    const albumArt = document.getElementById('albumArt');
+    const progressFill = document.getElementById('progressFill');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalTimeEl = document.getElementById('totalTime');
+    const djComment = document.getElementById('djComment');
+    const djText = document.getElementById('djText');
+    const lyricsSection = document.getElementById('lyricsSection');
+
+    function addMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.textContent = text;
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function setStatus(text, state) {
+      statusText.textContent = text;
+      statusDot.className = `status-dot ${state}`;
+    }
+
+    function formatTime(s) {
+      if (!s) return '0:00';
+      return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+    }
+
+    function parseLyrics(text) {
+      if (!text) return [];
+      return text.split('\n')
+        .filter(l => l.includes(']'))
+        .map(l => {
+          const match = l.match(/\[(\d{2}):(\d{2})\.\d{2}\](.*)/);
+          if (match) {
+            return { time: parseInt(match[1]) * 60 + parseInt(match[2]), text: match[3].trim() };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
+
+    function highlightLyric(time) {
+      const lines = lyricsSection.querySelectorAll('.lyric-line');
+      let activeIdx = 0;
+      for (let i = 0; i < lyricLines.length; i++) {
+        if (lyricLines[i].time <= time) activeIdx = i;
+      }
+      lines.forEach((l, i) => l.classList.toggle('active', i === activeIdx));
+      if (lines[activeIdx]) {
+        lines[activeIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function stopTTS() {
+      // 停止 MiniMax TTS
+      if (window.currentTTSAudio) {
+        window.currentTTSAudio.pause();
+        window.currentTTSAudio = null;
+      }
+      // 停止 Web Speech
+      if (synth) {
+        synth.cancel();
+      }
+      setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
+    }
+
+    function updateMuteButton() {
+      const muteBtn = document.getElementById('muteBtn');
+      muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    }
+
+    async function speakText(text) {
+      if (!text) return;
+      if (isMuted) return;
+
+      // 首先尝试 MiniMax TTS
+      try {
+        setStatus('DJ 播报中', 'speaking');
+        const res = await fetch('http://localhost:3001/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, speed: 1.0, emotion: 'calm' })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.audio) {
+            // 停止之前的语音
+            if (window.currentTTSAudio) {
+              window.currentTTSAudio.pause();
+            }
+            const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+            window.currentTTSAudio = audio;
+            audio.onended = () => {
+              if (isPlaying) setStatus('播放中', 'playing');
+              else setStatus('待机', 'idle');
+            };
+            audio.onerror = () => {
+              console.warn('[TTS] MiniMax playback failed, falling back to Web Speech');
+              if (!isMuted) fallbackToWebSpeech(text);
+            };
+            audio.play();
+            return; // 成功播放，退出
+          }
+        }
+      } catch (err) {
+        console.warn('[TTS] MiniMax TTS failed:', err);
+      }
+
+      // 降级到 Web Speech Synthesis
+      fallbackToWebSpeech(text);
+    }
+
+    function fallbackToWebSpeech(text) {
+      if (!synth) {
+        console.warn('[TTS] Web Speech Synthesis not available');
+        setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
+        return;
+      }
+      if (isMuted) return;
+
+      synth.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'zh-CN';
+      utt.rate = 1.0;
+      utt.pitch = 1.0;
+
+      utt.onstart = () => setStatus('DJ 播报中', 'speaking');
+      utt.onend = () => {
+        if (isPlaying) setStatus('播放中', 'playing');
+        else setStatus('待机', 'idle');
+      };
+      utt.onerror = () => {
+        if (isPlaying) setStatus('播放中', 'playing');
+        else setStatus('待机', 'idle');
+      };
+
+      synth.speak(utt);
+    }
+
+    // 播放时请求 AI 生成 DJ 解说
+    async function requestDJCommentary(track) {
+      try {
+        setStatus('DJ 思考中...', 'speaking');
+        const res = await fetch('http://localhost:3001/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'minimax',
+            message: `请为这首歌曲生成一段 DJ 解说。我需要你简洁地介绍这首歌的音乐风格、演唱者背景或者听感体验，用于在电台节目中播放。格式要求：直接返回 JSON，格式：{"say":"解说内容"}。歌曲信息：${track.name} - ${track.artist}，专辑：${track.album}`
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // 确保 say 有有效内容
+        if (data.say && typeof data.say === 'string' && data.say.trim()) {
+          djText.textContent = data.say;
+          // 延迟一点再播报，让用户先看到文字
+          setTimeout(() => speakText(data.say), 500);
+        } else {
+          djText.textContent = `正在播放：${track.name} - ${track.artist}`;
+        }
+      } catch (err) {
+        console.error('[DJ] Commentary error:', err);
+        djText.textContent = `正在播放：${track.name} - ${track.artist}`;
+      }
+    }
+
+    function playTrack(data) {
+      if (audio) { audio.pause(); audio = null; }
+      currentTrackData = data;
+      trackName.textContent = data.name || '未知';
+      artistName.textContent = data.artist || '未知';
+      albumName.textContent = data.album || '未知';
+
+      if (data.albumPic) {
+        albumArt.innerHTML = `<img src="${data.albumPic}" alt="album">`;
+      } else {
+        albumArt.innerHTML = '🎵';
+      }
+
+      if (data.url) {
+        audio = new Audio(data.url);
+        audio.play();
+        isPlaying = true;
+        document.getElementById('playBtn').textContent = '⏸';
+        albumArt.classList.add('playing');
+        setStatus('播放中', 'playing');
+
+        // 解析歌词
+        lyricLines = parseLyrics(data.lyric);
+        lyricsSection.innerHTML = lyricLines.length > 0
+          ? lyricLines.map((l, i) => `<div class="lyric-line ${i === 0 ? 'active' : ''}">${l.text || '♪'}</div>`).join('')
+          : '<div class="lyric-line">暂无歌词</div>';
+
+        audio.addEventListener('loadedmetadata', () => {
+          totalTimeEl.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('timeupdate', () => {
+          if (audio.duration) {
+            progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            highlightLyric(audio.currentTime);
+          }
+        });
+
+        audio.addEventListener('ended', () => {
+          isPlaying = false;
+          document.getElementById('playBtn').textContent = '▶';
+          albumArt.classList.remove('playing');
+          setStatus('播放结束', 'idle');
+          playNext();
+        });
+
+        // 播放时请求 DJ 解说
+        requestDJCommentary(data);
+      }
+    }
+
+    function togglePlay() {
+      if (!audio) return;
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        document.getElementById('playBtn').textContent = '▶';
+        setStatus('已暂停', 'idle');
+      } else {
+        audio.play();
+        isPlaying = true;
+        document.getElementById('playBtn').textContent = '⏸';
+        setStatus('播放中', 'playing');
+      }
+    }
+
+    function playNext() {
+      console.log(`[Playlist] playNext: length=${playlist.length}, currentIndex=${currentIndex}`);
+      if (playlist.length === 0) {
+        console.warn('[Playlist] Playlist is empty!');
+        return;
+      }
+      if (currentIndex < 0) currentIndex = 0;
+      currentIndex = (currentIndex + 1) % playlist.length;
+      console.log(`[Playlist] Playing index ${currentIndex}:`, playlist[currentIndex]?.name);
+      playTrack(playlist[currentIndex]);
+    }
+
+    function playPrev() {
+      console.log(`[Playlist] playPrev: length=${playlist.length}, currentIndex=${currentIndex}`);
+      if (playlist.length === 0) {
+        console.warn('[Playlist] Playlist is empty!');
+        return;
+      }
+      if (currentIndex < 0) currentIndex = 0;
+      currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      console.log(`[Playlist] Playing index ${currentIndex}:`, playlist[currentIndex]?.name);
+      playTrack(playlist[currentIndex]);
+    }
+
+    // 语音识别
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'zh-CN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        messageInput.value = text;
+        sendMessage();
+      };
+
+      recognition.onerror = () => {
+        voiceBtn.classList.remove('recording');
+        addMessage('语音识别出错', 'ai');
+      };
+
+      recognition.onend = () => {
+        voiceBtn.classList.remove('recording');
+      };
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+      messageInput.value = '';
+      addMessage(text, 'user');
+      setStatus('思考中...', 'speaking');
+
+      try {
+        const res = await fetch('http://localhost:3001/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'minimax', message: text })
+        });
+        const data = await res.json();
+
+        if (data.say && typeof data.say === 'string' && data.say.trim()) {
+          addMessage(data.say, 'ai');
+          speakText(data.say);
+        } else if (data.reason) {
+          // 有 reason 但没有 say，显示提示
+          addMessage('[DJ 思考中...]', 'ai');
+        }
+
+        if (data.segue) {
+          djText.textContent = data.segue;
+        }
+
+        if (data.play && data.play.length > 0) {
+          // 批量获取所有歌曲的播放数据
+          const batchRes = await fetch('http://localhost:3001/api/music/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ songs: data.play })
+          });
+          const batchData = await batchRes.json();
+
+          if (batchData.songs && batchData.songs.length > 0) {
+            playlist = batchData.songs;
+            currentIndex = 0;
+            addMessage(`🎵 播放列表: ${data.play.join(', ')}`, 'song');
+            playTrack(playlist[currentIndex]);
+          } else {
+            addMessage('无法播放这些歌曲', 'ai');
+          }
+        }
+      } catch (err) {
+        addMessage('出错: ' + err.message, 'ai');
+      }
+      setStatus(isPlaying ? '播放中' : '待机', isPlaying ? 'playing' : 'idle');
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    document.getElementById('playBtn').addEventListener('click', togglePlay);
+    document.getElementById('nextBtn').addEventListener('click', () => { addMessage('下一首', 'user'); playNext(); });
+    document.getElementById('prevBtn').addEventListener('click', () => { addMessage('上一首', 'user'); playPrev(); });
+
+    document.getElementById('progressBar').addEventListener('click', e => {
+      if (!audio || !audio.duration) return;
+      const rect = e.target.getBoundingClientRect();
+      audio.currentTime = (e.clientX - rect.left) / rect.width * audio.duration;
+    });
+
+    const voiceBtn = document.getElementById('voiceBtn');
+    if (recognition) {
+      voiceBtn.addEventListener('click', () => {
+        if (voiceBtn.classList.contains('recording')) {
+          recognition.stop();
+          return;
+        }
+        voiceBtn.classList.add('recording');
+        recognition.start();
+      });
+    } else {
+      voiceBtn.title = '浏览器不支持语音识别';
+    }
+
+    // 静音按钮
+    const muteBtn = document.getElementById('muteBtn');
+    muteBtn.style.display = 'block';
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      if (isMuted) {
+        stopTTS();
+      }
+      updateMuteButton();
+    });
+  </script>
+</body>
 </html>

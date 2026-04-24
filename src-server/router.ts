@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { musicRouter } from './routes/music';
+import { chatRouter } from './routes/chat.js';
+import { ttsRouter } from './routes/tts.js';
 
 export const router = Router();
 
@@ -8,3 +10,5 @@ router.get('/status', (_req, res) => {
 });
 
 router.use('/music', musicRouter);
+router.use('/chat', chatRouter);
+router.use('/tts', ttsRouter);

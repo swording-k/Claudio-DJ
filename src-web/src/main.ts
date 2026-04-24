@@ -1,4 +1,2 @@
-import '../styles/main.css';
-import { App } from './App';
-
-customElements.define('app-root', App);
+// Main entry point - simplified for debugging
+console.log('Claudio DJ loaded');

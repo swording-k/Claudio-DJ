@@ -1,6 +1,6 @@
 /**
  * AI Adapter Interface and Registry
- * Supports multiple AI providers (Claude, Qwen, etc.)
+ * Supports multiple AI providers (Claude, Qwen, MiniMax, etc.)
  */
 
 export interface AIResponse {
@@ -16,6 +16,15 @@ export interface AIAdapter {
 }
 
 const adapters: Map<string, AIAdapter> = new Map();
+
+// 自动注册内置适配器
+import { claudeAdapter } from './claude.js';
+import { qwenAdapter } from './qwen.js';
+import { MiniMaxAdapter } from './minimax.js';
+
+registerAdapter(claudeAdapter);
+registerAdapter(qwenAdapter);
+registerAdapter(new MiniMaxAdapter());
 
 /**
  * Register an AI adapter
@@ -33,6 +42,14 @@ export function getAdapter(name: string): AIAdapter {
     throw new Error(`Unknown AI adapter: ${name}. Available: ${[...adapters.keys()].join(', ')}`);
   }
   return adapter;
+}
+
+/**
+ * Generate with a specific model
+ */
+export async function generateWithModel(model: string, prompt: string): Promise<AIResponse> {
+  const adapter = getAdapter(model);
+  return adapter.generate(prompt);
 }
 
 /**

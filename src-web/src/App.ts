@@ -1,11 +1,9 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
 import './components/StatusBar';
 import './components/Player';
 import './components/Controls';
 import './components/BroadcastCard';
 
-@customElement('app-root')
 export class App extends LitElement {
   static styles = css`
     :host {
@@ -15,7 +13,6 @@ export class App extends LitElement {
       color: #F59E0B;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-
     .container {
       display: flex;
       flex-direction: column;
@@ -25,7 +22,6 @@ export class App extends LitElement {
       padding: 2rem;
       gap: 2rem;
     }
-
     .title {
       font-size: 2rem;
       font-weight: 700;
@@ -34,22 +30,31 @@ export class App extends LitElement {
       margin: 0;
       color: #E5E5E5;
     }
-
     .section {
       width: 100%;
       max-width: 400px;
     }
   `;
 
-  @state() private currentTime = '';
-  @state() private status: 'idle' | 'playing' | 'speaking' | 'listening' = 'idle';
-  @state() private isPlaying = false;
-  @state() private songName = '等待播放';
-  @state() private artist = '---';
-  @state() private progress = 0;
-  @state() private messages: Array<{ text: string; type: 'broadcast' | 'user' | 'ai' }> = [];
+  currentTime = '';
+  status: 'idle' | 'playing' | 'speaking' | 'listening' = 'idle';
+  isPlaying = false;
+  songName = '等待播放';
+  artist = '---';
+  progress = 0;
+  messages: Array<{ text: string; type: 'broadcast' | 'user' | 'ai' }> = [];
 
   private clockInterval: number | null = null;
+
+  static properties = {
+    currentTime: { type: String },
+    status: { type: String },
+    isPlaying: { type: Boolean },
+    songName: { type: String },
+    artist: { type: String },
+    progress: { type: Number },
+    messages: { type: Array },
+  };
 
   connectedCallback() {
     super.connectedCallback();
@@ -117,3 +122,5 @@ export class App extends LitElement {
     `;
   }
 }
+
+customElements.define('app-root', App);
