@@ -7,7 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -58,3 +60,24 @@ jobs:
           name: ${{ matrix.artifact }}
           path: src-tauri/target/${{ matrix.target }}/release/bundle/**/*
           if-no-files-found: ignore
+
+  create-release:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/Claudio-DJ-macOS/*
+            artifacts/Claudio-DJ-Windows/*
+            artifacts/Claudio-DJ-Linux/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
