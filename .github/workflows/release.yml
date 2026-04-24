@@ -7,77 +7,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-22.04, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "$HOME/.cargo/env" >> $GITHUB_ENV
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build Tauri app (macOS)
-        run: npm run tauri build -- --target aarch64-apple-darwin
-
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
         with:
-          name: Claudio-DJ-macOS
-          path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.exe
-          rustup-init.exe -y
-          echo "$HOME/.cargo/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build Tauri app (Windows)
-        run: npm run tauri build -- --target x86_64-pc-windows-msvc
-
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Claudio-DJ-Windows
-          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**/*.exe
-
-  build-linux:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source "$HOME/.cargo/env"
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || matrix.platform == 'windows-latest' && 'x86_64-pc-windows-msvc' || 'x86_64-unknown-linux-gnu' }}
 
       - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
@@ -85,11 +40,17 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Build Tauri app (Linux)
-        run: source "$HOME/.cargo/env" && npm run tauri build -- --target x86_64-unknown-linux-gnu
-
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: Claudio-DJ-Linux
-          path: src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/**/*.AppImage
+          tagName: v__VERSION__
+          releaseName: 'Claudio DJ v__VERSION__'
+          releaseBody: |
+            下载适合你系统的安装包：
+            - macOS: .dmg (Apple Silicon)
+            - Windows: .exe
+            - Linux: .AppImage
+          releaseDraft: false
+          prerelease: false
