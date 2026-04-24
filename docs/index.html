@@ -3,252 +3,787 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claudio DJ - 你的个人 AI 电台</title>
+  <title>Claudio DJ — 你的个人 AI 电台</title>
   <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161d;
+      --accent: #f59e0b;
+      --accent-light: #fbbf24;
+      --accent-dim: rgba(245,158,11,0.15);
+      --text-primary: #f5f5f7;
+      --text-secondary: #86868b;
+      --text-muted: #48484a;
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      background: linear-gradient(180deg, #0D0D12 0%, #141418 100%);
-      color: #E5E5E5;
-      font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
+
+    a { color: inherit; text-decoration: none; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
     }
-    .header {
-      text-align: center;
-      padding: 3rem 0;
-    }
-    .logo {
-      font-size: 4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: 0.15em;
-      margin-bottom: 0.5rem;
     }
-    .tagline {
-      font-size: 1.25rem;
-      color: #888;
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
     }
+    .nav-links a {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
 
+    /* HERO */
     .hero {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 2rem 0;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
     }
-    .screenshot {
-      max-width: 320px;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      margin-bottom: 2rem;
-      border: 1px solid rgba(255,255,255,0.1);
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse, rgba(245,158,11,0.12) 0%, transparent 70%);
+      pointer-events: none;
     }
-
-    .download-card {
-      background: linear-gradient(145deg, #1e1e2e 0%, #141418 100%);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 24px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 2rem;
-    }
-    .download-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 1.5rem;
-    }
-    .os-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .os-btn {
-      display: flex;
-      flex-direction: column;
+    .hero-badge {
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 1.5rem 1rem;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid transparent;
-      cursor: pointer;
+      padding: 0.375rem 1rem;
+      border-radius: 999px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+    .hero-badge span { font-size: 0.7rem; }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(160deg, #fff 0%, #999 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      color: #0a0a0f;
+      font-size: 1rem;
+      font-weight: 600;
       transition: all 0.2s;
-      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(245,158,11,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(245,158,11,0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* PHONE MOCKUP */
+    .phone-mockup {
+      width: 260px;
+      height: 520px;
+      border-radius: 36px;
+      background: linear-gradient(145deg, #1e1e28 0%, #14141a 100%);
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow:
+        0 0 0 8px rgba(255,255,255,0.03),
+        0 40px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      margin: 3rem 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-notch {
+      width: 80px;
+      height: 24px;
+      background: #0a0a0f;
+      border-radius: 0 0 16px 16px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .phone-screen {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.25rem 0;
+    }
+    .phone-logo {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+    }
+    .phone-status {
+      width: 24px;
+      height: 12px;
+      border-radius: 6px;
+      background: #333;
+      position: relative;
+    }
+    .phone-status::after {
+      content: '';
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+    }
+    .phone-waves {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      padding: 1rem;
+    }
+    .wave-bar {
+      width: 4px;
+      border-radius: 2px;
+      background: linear-gradient(to top, var(--accent), var(--accent-light));
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+    .wave-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { height: 65px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(5) { height: 50px; animation-delay: 0.4s; }
+    .wave-bar:nth-child(6) { height: 35px; animation-delay: 0.5s; }
+    .wave-bar:nth-child(7) { height: 20px; animation-delay: 0.6s; }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); opacity: 0.6; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+    .phone-info {
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      margin-top: auto;
+    }
+    .phone-song {
+      font-size: 0.7rem;
+      font-weight: 600;
       color: #fff;
     }
-    .os-btn:hover {
-      background: rgba(245,158,11,0.1);
-      border-color: #F59E0B;
-    }
-    .os-btn.active {
-      background: rgba(245,158,11,0.15);
-      border-color: #F59E0B;
-    }
-    .os-btn .icon {
-      font-size: 2rem;
-    }
-    .os-btn .name {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    .os-btn .desc {
-      font-size: 0.75rem;
-      color: #888;
-    }
-    .download-btn {
-      display: block;
-      width: 100%;
-      padding: 1rem;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-      color: #08080C;
-      font-size: 1.1rem;
-      font-weight: 600;
-      text-decoration: none;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .download-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(245,158,11,0.4);
-    }
-    .download-note {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 1rem;
-      text-align: center;
+    .phone-artist {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
+    /* SECTIONS */
+    section {
+      padding: 6rem 2rem;
+    }
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+    .section-desc {
+      color: var(--text-secondary);
+      max-width: 560px;
+      font-size: 1.05rem;
+    }
+
+    /* FEATURES */
     .features {
+      background: var(--bg-secondary);
+    }
+    .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
     }
-    .feature {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 1.25rem;
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      transition: all 0.25s;
     }
-    .feature h3 {
-      color: #F59E0B;
-      font-size: 1rem;
+    .feature-card:hover {
+      border-color: rgba(245,158,11,0.25);
+      background: rgba(245,158,11,0.03);
+      transform: translateY(-3px);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .feature-title {
+      font-size: 1.05rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
     }
-    .feature p {
-      color: #888;
-      font-size: 0.85rem;
-      line-height: 1.5;
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
     }
 
-    .footer {
-      text-align: center;
-      padding: 3rem 0 2rem;
-      color: #555;
+    /* DOWNLOAD */
+    .download {
+      background: var(--bg-primary);
+    }
+    .download-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 3rem;
+    }
+    @media (max-width: 768px) {
+      .download-content { grid-template-columns: 1fr; }
+    }
+    .download-platforms {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .platform-card {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .platform-card:hover {
+      border-color: rgba(245,158,11,0.3);
+      background: rgba(245,158,11,0.04);
+      transform: translateX(4px);
+    }
+    .platform-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .platform-info { flex: 1; }
+    .platform-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .platform-arch {
       font-size: 0.8rem;
+      color: var(--text-secondary);
     }
-    .footer a {
-      color: #F59E0B;
-      text-decoration: none;
+    .platform-download {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 600;
     }
-    .version {
-      margin-top: 1rem;
-      color: #444;
+    .download-note {
+      margin-top: 2rem;
+      padding: 1rem 1.25rem;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .download-note strong { color: var(--accent); }
+
+    .download-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    @media (max-width: 500px) {
-      .os-options {
-        grid-template-columns: 1fr;
-      }
-      .logo {
-        font-size: 2.5rem;
-      }
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 6rem 2rem;
+      background: radial-gradient(ellipse at center, rgba(245,158,11,0.08) 0%, transparent 60%);
     }
+    .cta-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .cta-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .footer-brand {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .footer-copy a { color: var(--accent); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="logo">CLAUDIO DJ</div>
-      <p class="tagline">你的个人 AI 电台 DJ</p>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">CLAUDIO DJ</div>
+    <ul class="nav-links">
+      <li><a href="#features">功能特点</a></li>
+      <li><a href="#download">下载</a></li>
+      <li><a href="https://github.com/swording-k/Claudio-DJ" target="_blank">源码</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>v0.1.2</span>
+      &nbsp;·&nbsp; 个人 AI 电台新时代
     </div>
 
-    <div class="hero">
-      <img src="screenshot.png" alt="Claudio DJ 界面" class="screenshot" onerror="this.style.display='none'">
+    <h1 class="hero-title">
+      你的 <span>AI 电台</span><br>私人 DJ
+    </h1>
 
-      <div class="download-card">
-        <div class="download-title">下载安装</div>
-        <div class="os-options">
-          <a href="https://github.com/swording-k/Claudio-DJ/releases/download/v0.1.0/Claudio-DJ-0.1.0-macOS.dmg" class="os-btn" id="macos-btn" target="_blank">
-            <span class="icon">🍎</span>
-            <span class="name">macOS</span>
-            <span class="desc">Apple 芯片</span>
+    <p class="hero-subtitle">
+      融合语音对话、音乐播放与智能解说的桌面应用。<br>
+      说出你想听的，让 AI 为你解说、为你播放。
+    </p>
+
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        📥 立即下载
+      </a>
+      <a href="https://github.com/swording-k/Claudio-DJ" class="btn-secondary" target="_blank">
+        🔍 查看源码
+      </a>
+    </div>
+
+    <!-- Phone Mockup -->
+    <div class="phone-mockup">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">
+          <div class="phone-logo">CLAUDIO</div>
+          <div class="phone-status"></div>
+        </div>
+        <div class="phone-waves">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="phone-info">
+          <div class="phone-song">夜曲 · 周杰伦</div>
+          <div class="phone-artist">期待你再次回来</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-value">3</div>
+        <div class="stat-label">平台支持</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">v0.1.2</div>
+        <div class="stat-label">最新版本</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">MIT</div>
+        <div class="stat-label">开源协议</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-inner">
+      <div class="section-label">为什么选择 Claudio DJ</div>
+      <h2 class="section-title">不只是播放器，<br>是你的专属音乐伴侣</h2>
+      <p class="section-desc">
+        将 AI 对话、音乐播放与语音合成深度融合，创造前所未有的音乐互动体验。
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎵</div>
+          <div class="feature-title">网易云音乐支持</div>
+          <div class="feature-desc">海量曲库，想听什么直接说。支持语音点歌、智能搜索，让音乐触手可及。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎙️</div>
+          <div class="feature-title">AI DJ 解说</div>
+          <div class="feature-desc">播放时自动生成 DJ 风格解说，介绍歌曲风格、创作背景和艺人故事，如同拥有私人电台主持人。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <div class="feature-title">自然对话交互</div>
+          <div class="feature-desc">用语音或文字与 DJ 实时对话，讨论音乐、获取推荐、点播歌曲 — 就像和朋友聊天一样自然。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⏰</div>
+          <div class="feature-title">定时广播</div>
+          <div class="feature-desc">设置早中晚定时播放，起床有音乐陪伴，回家不孤单。个性化定时，告别无聊空白。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔊</div>
+          <div class="feature-title">自然语音合成</div>
+          <div class="feature-desc">采用 MiniMax 高质量 TTS 技术，DJ 声音自然流畅，支持多种情感风格调节。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-title">多 AI 模型支持</div>
+          <div class="feature-desc">兼容 Claude、通义千问、豆包、智谱等多种大模型，可根据喜好自由切换。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">跨平台支持</div>
+          <div class="feature-desc">macOS、Windows、Linux 三大平台全覆盖，配置要求低，老旧设备也能流畅运行。</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <div class="feature-title">本地记忆</div>
+          <div class="feature-desc">基于 Markdown + SQLite 的本地记忆系统，保护隐私的同时记住你的音乐偏好。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="download" id="download">
+    <div class="section-inner">
+      <div class="section-label">免费下载</div>
+      <h2 class="section-title">支持三大平台</h2>
+      <p class="section-desc">选择你的操作系统，点击下载即可开始使用。</p>
+
+      <div class="download-content">
+        <div class="download-platforms">
+          <!-- macOS -->
+          <a class="platform-card" id="platform-macos">
+            <div class="platform-icon">🍎</div>
+            <div class="platform-info">
+              <div class="platform-name">macOS</div>
+              <div class="platform-arch">Apple 芯片 (M1/M2/M3) · dmg 安装包</div>
+            </div>
+            <div class="platform-download">↓ 下载</div>
           </a>
-          <a href="https://github.com/swording-k/Claudio-DJ/releases/download/v0.1.0/Claudio-DJ-0.1.0-Windows.exe" class="os-btn" id="windows-btn" target="_blank">
-            <span class="icon">🪟</span>
-            <span class="name">Windows</span>
-            <span class="desc">即将推出</span>
+
+          <!-- Windows -->
+          <a class="platform-card" id="platform-windows">
+            <div class="platform-icon">🪟</div>
+            <div class="platform-info">
+              <div class="platform-name">Windows</div>
+              <div class="platform-arch">x64 架构 · exe 安装包</div>
+            </div>
+            <div class="platform-download">↓ 下载</div>
+          </a>
+
+          <!-- Linux -->
+          <a class="platform-card" id="platform-linux">
+            <div class="platform-icon">🐧</div>
+            <div class="platform-info">
+              <div class="platform-name">Linux</div>
+              <div class="platform-arch">x64 架构 · AppImage / deb</div>
+            </div>
+            <div class="platform-download">↓ 下载</div>
           </a>
         </div>
-        <a href="https://github.com/swording-k/Claudio-DJ/releases/download/v0.1.0/Claudio-DJ-0.1.0-macOS.dmg" class="download-btn" id="download-btn">
-          📥 立即下载 for macOS
-        </a>
-        <p class="download-note">需要搭配后端服务使用 · v0.1.0</p>
+
+        <div class="download-visual">
+          <div class="phone-mockup" style="transform: scale(0.85);">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-header">
+                <div class="phone-logo">CLAUDIO</div>
+                <div class="phone-status"></div>
+              </div>
+              <div class="phone-waves">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+              </div>
+              <div class="phone-info">
+                <div class="phone-song">下载完成</div>
+                <div class="phone-artist">准备开始你的音乐之旅</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="features">
-        <div class="feature">
-          <h3>🎵 智能音乐播放</h3>
-          <p>支持网易云音乐海量曲库，语音点歌，想听什么说出来</p>
-        </div>
-        <div class="feature">
-          <h3>🎙️ AI DJ 解说</h3>
-          <p>播放时自动生成 DJ 解说，介绍歌曲风格和背景故事</p>
-        </div>
-        <div class="feature">
-          <h3>💬 自然对话</h3>
-          <p>可以和 DJ 聊天，讨论音乐，获取个性化推荐</p>
-        </div>
-        <div class="feature">
-          <h3>⏰ 定时广播</h3>
-          <p>设置早中晚定时播放，起床或回家都有音乐陪伴</p>
-        </div>
+      <div class="download-note">
+        <strong>⚠️ 提示：</strong> Claudio DJ 需要搭配后端服务运行。后端服务提供音乐播放、AI 对话和语音合成能力。
+        请参考 <a href="https://github.com/swording-k/Claudio-DJ" target="_blank" style="color:var(--accent)">GitHub 仓库</a> 的说明进行部署。
       </div>
     </div>
+  </section>
 
-    <div class="footer">
-      <p>Made with ❤️ by <a href="https://github.com/swording-k">@swording-k</a></p>
-      <p><a href="https://github.com/swording-k/Claudio-DJ"> 源码</a> · <a href="https://github.com/swording-k/Claudio-DJ/releases"> Releases</a></p>
-      <p class="version">Version 0.1.0</p>
+  <!-- CTA -->
+  <section class="cta">
+    <h2 class="cta-title">准备好开启你的 AI 电台了吗？</h2>
+    <p class="cta-subtitle">免费、开源、跨平台 — 从今天开始。</p>
+    <a href="#download" class="btn-primary">📥 免费下载</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">CLAUDIO DJ</div>
+      <div class="footer-links">
+        <a href="https://github.com/swording-k/Claudio-DJ" target="_blank">GitHub</a>
+        <a href="https://github.com/swording-k/Claudio-DJ/releases" target="_blank">Releases</a>
+        <a href="https://github.com/swording-k/Claudio-DJ/releases/tag/v0.1.2" target="_blank">v0.1.2</a>
+      </div>
+      <p class="footer-copy">
+        Made with ❤️ by <a href="https://github.com/swording-k" target="_blank">@swording-k</a>
+        · MIT License
+      </p>
     </div>
-  </div>
+  </footer>
 
   <script>
-    // OS 检测并高亮对应按钮
+    // OS detection & link routing
     const userAgent = navigator.userAgent.toLowerCase();
     const isMac = /mac/.test(userAgent);
     const isWindows = /win/.test(userAgent);
+    const isLinux = /linux/.test(userAgent);
+
+    // GitHub release base URL
+    const releaseBase = 'https://github.com/swording-k/Claudio-DJ/releases/download/v0.1.2';
+
+    const platforms = {
+      macos: {
+        href: releaseBase + '/Claudio-DJ-macOS/Claudio-DJ_0.1.2_aarch64.dmg',
+        label: '↓ 下载 for macOS'
+      },
+      windows: {
+        href: releaseBase + '/Claudio-DJ-Windows/Claudio-DJ_0.1.2_x64.exe',
+        label: '↓ 下载 for Windows'
+      },
+      linux: {
+        href: releaseBase + '/Claudio-DJ-Linux/Claudio-DJ_0.1.2_amd64.AppImage',
+        label: '↓ 下载 for Linux'
+      }
+    };
+
+    // Set active platform style
+    function setActive(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.borderColor = 'rgba(245,158,11,0.4)';
+    }
 
     if (isMac) {
-      document.getElementById('macos-btn').classList.add('active');
-      document.getElementById('download-btn').textContent = '📥 立即下载 for macOS';
+      setActive('platform-macos');
     } else if (isWindows) {
-      document.getElementById('windows-btn').classList.add('active');
-      document.getElementById('download-btn').textContent = '📥 立即下载 for Windows';
-      document.getElementById('download-btn').href = 'https://github.com/swording-k/Claudio-DJ/releases/download/v0.1.0/Claudio-DJ-0.1.0-Windows.exe';
+      setActive('platform-windows');
+    } else if (isLinux) {
+      setActive('platform-linux');
     } else {
-      document.getElementById('macos-btn').classList.add('active');
+      setActive('platform-macos');
     }
+
+    // Set download links
+    document.getElementById('platform-macos').href = platforms.macos.href;
+    document.getElementById('platform-windows').href = platforms.windows.href;
+    document.getElementById('platform-linux').href = platforms.linux.href;
   </script>
 </body>
 </html>

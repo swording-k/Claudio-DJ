@@ -52,7 +52,9 @@ jobs:
         run: npm ci
 
       - name: Build Tauri app
-        run: npm run tauri build -- --target ${{ matrix.target }}
+        run: |
+          npm run build:web
+          npm run tauri build -- --target ${{ matrix.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -77,8 +79,25 @@ jobs:
         with:
           draft: false
           prerelease: false
+          name: Claudio DJ v0.1.2
+          body: |
+            ## 下载安装
+
+            | 平台 | 下载文件 |
+            |------|----------|
+            | macOS (Apple 芯片) | Claudio-DJ-macOS |
+            | Windows | Claudio-DJ-Windows |
+            | Linux | Claudio-DJ-Linux |
+
+            ### 各平台下载说明
+            - **macOS**：下载 .dmg 文件，打开后拖入应用程序文件夹即可
+            - **Windows**：下载 .exe 安装包，运行安装
+            - **Linux**：下载 .AppImage 或 .deb 文件
+
+            ---
+            *需要搭配后端服务使用，详见 [GitHub 仓库](https://github.com/swording-k/Claudio-DJ)*
           files: |
-            artifacts/Claudio-DJ-macOS/*
+            artifacts/Claudio-DJ-macOS/**/*
             artifacts/Claudio-DJ-Windows/*
             artifacts/Claudio-DJ-Linux/*
         env:
