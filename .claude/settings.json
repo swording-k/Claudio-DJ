@@ -34,7 +34,14 @@
       "WebSearch",
       "WebFetch(domain:www.minimaxi.com)",
       "WebFetch(domain:platform.minimaxi.com)",
-      "mcp__github__get_me"
+      "mcp__github__get_me",
+      "Bash(sh -s -- -y)",
+      "Bash(convert -size 32x32 xc:'#F59E0B' 32x32.png)",
+      "Bash(convert -size 128x128 xc:'#F59E0B' 128x128.png)",
+      "Bash(convert -size 256x256 xc:'#F59E0B' 128x128@2x.png)",
+      "Bash(magick -size 512x512 xc:'#F59E0B' icon.png)",
+      "Bash(magick icon.png -colors 256 icon.ico)",
+      "Bash(magick icon.png -colors 256 icon.icns)"
     ],
     "additionalDirectories": [
       "/tmp"

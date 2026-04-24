@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claudio DJ - 你的个人 AI 电台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, #0D0D12 0%, #141418 100%);
+      color: #E5E5E5;
+      font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .logo {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+    .tagline {
+      font-size: 1.5rem;
+      color: #888;
+      margin-bottom: 3rem;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin-bottom: 3rem;
+    }
+    .feature {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .feature h3 {
+      color: #F59E0B;
+      margin-bottom: 0.5rem;
+    }
+    .feature p {
+      color: #888;
+      font-size: 0.9rem;
+    }
+    .download {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+      color: #08080C;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(245,158,11,0.3);
+    }
+    .version {
+      color: #555;
+      font-size: 0.8rem;
+      margin-top: 2rem;
+    }
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #555;
+      font-size: 0.8rem;
+    }
+    .footer a {
+      color: #F59E0B;
+      text-decoration: none;
+    }
+    .screenshot {
+      max-width: 320px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="logo">CLAUDIO DJ</div>
+    <p class="tagline">你的个人 AI 电台 DJ</p>
+
+    <img src="screenshot.png" alt="Claudio DJ 界面" class="screenshot" onerror="this.style.display='none'">
+
+    <div class="features">
+      <div class="feature">
+        <h3>🎵 智能音乐播放</h3>
+        <p>支持网易云音乐海量曲库，语音点歌，想听什么说出来</p>
+      </div>
+      <div class="feature">
+        <h3>🎙️ AI DJ 解说</h3>
+        <p>播放时自动生成 DJ 解说，介绍歌曲风格和背景故事</p>
+      </div>
+      <div class="feature">
+        <h3>💬 自然对话</h3>
+        <p>可以和 DJ 聊天，讨论音乐，获取个性化推荐</p>
+      </div>
+      <div class="feature">
+        <h3>⏰ 定时广播</h3>
+        <p>设置早中晚定时播放，起床或回家都有音乐陪伴</p>
+      </div>
+    </div>
+
+    <div class="download">
+      <a href="https://github.com/swording-k/Claudio-DJ/releases" class="btn btn-primary">
+        📥 下载安装包
+      </a>
+      <a href="https://github.com/swording-k/Claudio-DJ" class="btn btn-secondary">
+        📂 查看源码
+      </a>
+    </div>
+
+    <p class="version">Version 0.1.0 · macOS · 需要搭配后端服务使用</p>
+  </div>
+
+  <div class="footer">
+    <p>Made with ❤️ by <a href="https://github.com/swording-k">@swording-k</a></p>
+    <p><a href="https://github.com/swording-k/Claudio-DJ/releases"> releases</a> 页面下载 .dmg 安装包</p>
+  </div>
+</body>
+</html>

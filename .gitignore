@@ -9,6 +9,7 @@ dist/
 src-tauri/target/
 src-tauri/src/*.exe
 src-tauri/*.pdb
+src-tauri/gen/
 
 # IDE
 .idea/
